@@ -127,6 +127,9 @@ body{overflow-x:hidden}
 .seg button[data-a="tty"][data-v="e"].on{background:var(--r)}
 .seg button[data-a="tty"][data-v="i"].on{background:var(--g)}
 .amt.exp input{color:var(--r)}.amt.inc input{color:var(--g)}
+.sw{display:flex;justify-content:space-between;align-items:center;padding:2px 4px;cursor:pointer}
+.sw input{width:22px;height:22px;padding:0;accent-color:var(--ac)}
+.row.ex{opacity:.6}
 </style></head><body>
 <main id="app"></main>
 <nav id="nv" hidden>
@@ -158,7 +161,7 @@ const seed=()=>migrate({cats:SEED.map(([g,n,i,c,s])=>({id:slug(g,n),g,n,i,c,s:s?
 goals:[['Emergency Fund','🛟',5000],['Pillar 3a','🏔️',7000],['Vacation & Goals','🌴',3000]].map(([n,i,t],k)=>({id:'g'+k,n,i,t,img:'',c:[]}))});
 const cat=id=>S.m.cats.find(c=>c.id===id)||{id:'',n:'Uncategorized',i:'❔',c:'#8e939d',g:'?',s:[]};
 const plain=h=>`<section class="plain">${h}</section>`;const tn=c=>`style="background:${c.c}1f;border-color:${c.c}38"`;const bub=c=>`<i class="bub" style="background:${c.c}40;color:${c.c}">${c.i}</i>`,card=h=>`<section class="card">${h}</section>`;
-const sum=(a,f)=>a.reduce((s,x)=>s+f(x),0),sp=(id,ym)=>-sum(S.tx.filter(t=>t.cat==id&&t.date.startsWith(ym)),t=>t.amt);
+const sum=(a,f)=>a.reduce((s,x)=>s+f(x),0),sp=(id,ym)=>-sum(S.tx.filter(t=>t.cat==id&&!t.ex&&t.date.startsWith(ym)),t=>t.amt);
 const bc=(a,p)=>a>p?'var(--r)':p>0&&a>=p*.85?'var(--am)':'var(--g)';const nx=ym=>{let[y,m]=ym.split('-').map(Number);return m==12?(y+1)+'-01':y+'-'+pad(m+1)};
 const addm=(ds,n)=>{const d=new Date(ds+'T12:00');d.setMonth(d.getMonth()+n);return iso(d)};
 
@@ -204,20 +207,20 @@ await b.commit();alert(n+' new transactions imported. Tap “Review” to check 
 
 // ---- views
 function vTx(){const[a,b]=R(S.rng),fl=t=>!S.f||(S.f.startsWith('t:')?(t.tags||[]).includes(S.f.slice(2)):t.cat===S.f),T=S.tx.filter(t=>t.date>=a&&t.date<=b&&fl(t)).sort((x,y)=>y.date.localeCompare(x.date)),
-inc=sum(T.filter(t=>t.amt>0),t=>t.amt),ex=-sum(T.filter(t=>t.amt<0),t=>t.amt),nr=S.tx.filter(t=>!t.rev).length;
+inc=sum(T.filter(t=>t.amt>0&&!t.ex),t=>t.amt),ex=-sum(T.filter(t=>t.amt<0&&!t.ex),t=>t.amt),nr=S.tx.filter(t=>!t.rev).length;
 const d=S.d,y=d.getFullYear(),mo=d.getMonth(),n=new Date(y,mo+1,0).getDate(),o=(new Date(y,mo,1).getDay()+6)%7,by={};
-S.tx.filter(t=>t.date.startsWith(ym())&&fl(t)).forEach(t=>{(by[t.date]=by[t.date]||{i:0,e:0})[t.amt>0?'i':'e']+=Math.abs(t.amt)});
+S.tx.filter(t=>t.date.startsWith(ym())&&fl(t)&&!t.ex).forEach(t=>{(by[t.date]=by[t.date]||{i:0,e:0})[t.amt>0?'i':'e']+=Math.abs(t.amt)});
 let c='<div class="cal">'+[...'MTWTFSS'].map(x=>`<u>${x}</u>`).join('')+'<s></s>'.repeat(o);
 for(let k=1;k<=n;k++){const ds=y+'-'+pad(mo+1)+'-'+pad(k),v=by[ds]||{};c+=`<button data-a="day" data-d="${ds}" class="${ds==iso(new Date)?'td':''}"><b>${k}</b>${v.i?`<em class="g">+${sh0(v.i)}</em>`:''}${v.e?`<em class="r">-${sh0(v.e)}</em>`:''}</button>`}
 c+='</div>';let last='',list='';
 T.forEach(t=>{if(t.date!=last){last=t.date;list+=`<small style="margin-top:8px">${new Date(t.date+'T12:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}</small>`}
-const k=cat(t.cat);list+=`<div class="row tint" ${tn(k)} data-a="edit" data-id="${t.id}">${bub(k)}<div class="g1"><b>${esc(k.n)}</b><small>${[t.desc,t.sub,...(t.tags||[]).map(x=>'#'+x),t.rec&&t.rec!='none'?'↻':'',t.rev?'':'to review'].filter(Boolean).map(esc).join(' · ')}</small></div><span class="${t.amt>0?'g':''}">${fm(t.amt)}</span></div>`});
+const k=cat(t.cat);list+=`<div class="row tint${t.ex?' ex':''}" ${tn(k)} data-a="edit" data-id="${t.id}">${bub(k)}<div class="g1"><b>${esc(k.n)}</b><small>${[t.desc,t.sub,...(t.tags||[]).map(x=>'#'+x),t.rec&&t.rec!='none'?'↻':'',t.ex?(t.from?'paid from savings':'excluded'):'',t.rev?'':'to review'].filter(Boolean).map(esc).join(' · ')}</small></div><span class="${t.amt>0?'g':''}">${fm(t.amt)}</span></div>`});
 return hd('Activity')+nav(true)+`<section class="card hero"><small>${S.f?'Balance (filtered)':'Balance'}</small><div class="hb ${inc-ex<0?'r':''}">${fm(inc-ex)}</div><div class="hs"><span class="g">↑ ${fm(inc)} (Income)</span><span class="r">↓ ${fm(ex)} (Expenses)</span></div></section>`+`<div class="act"><button class="pill p" data-a="add">＋ Add</button><button class="pill" data-a="rev">Review${nr?' ('+nr+')':''}</button><button class="pill" data-a="imp">Import CSV</button></div>
 <select id="ff"><option value="">All categories</option>${S.m.cats.map(k=>`<option value="${k.id}" ${S.f==k.id?'selected':''}>${k.i} ${esc(k.n)} (${GN[k.g]})</option>`).join('')}<optgroup label="Tags">${S.m.tags.map(g=>`<option value="t:${esc(g)}" ${S.f=='t:'+g?'selected':''}>🏷 ${esc(g)}</option>`).join('')}</optgroup></select>`
 +card(c)
 +plain(list||'<small>No transactions in this period.</small>')}
 
-function vRep(){const[a,b]=R(S.rng),T=S.tx.filter(t=>t.date>=a&&t.date<=b);let I=0;const spd={};
+function vRep(){const[a,b]=R(S.rng),T=S.tx.filter(t=>t.date>=a&&t.date<=b&&!t.ex);let I=0;const spd={};
 T.forEach(t=>{const c=S.m.cats.find(x=>x.id==t.cat);if(c?c.g=='i':t.amt>0)I+=t.amt;else{const id=t.cat||'?';spd[id]=(spd[id]||0)-t.amt}});
 const G={};for(const[id,v]of Object.entries(spd)){if(v<=0)continue;const c=cat(id),g=GN[c.g];(G[g]=G[g]||{v:0,k:[],c:GC[c.g]||'#8e939d'});G[g].v+=v;G[g].k.push([c,v])}
 const E=Object.entries(G),X=sum(E,e=>e[1].v),sv=Math.max(0,I-X),tot=Math.max(I,X)||1,mids=E.map(([n,g])=>({n,...g}));if(sv>0)mids.push({n:'Saved',c:'#62d6a4',v:sv,k:[]});
@@ -246,15 +249,15 @@ return hd('Bills & subscriptions')+card(`<small>Monthly cost</small><h2>${fm(tm)
 
 function carry(id,m){const b=S.m.bud[id];if(!b||!b.r)return 0;let c=0,y=S.m.start||S.tx.reduce((a,t)=>t.date<a?t.date:a,'9999-99').slice(0,7),n=0;while(y<m&&n++<120){c+=b.a-sp(id,y);y=nx(y)}return c}
 function vBud(){const m=ym();let P=0,A=0;const rows=S.m.cats.filter(c=>c.g!='i').map(c=>{const b=S.m.bud[c.id]||{a:0},p=b.a+carry(c.id,m),a=sp(c.id,m);P+=p;A+=a;const o=S.open[c.id];
-const subs=o?[...c.s,''].map(s=>{const v=-sum(S.tx.filter(t=>t.cat==c.id&&(t.sub||'')==s&&t.date.startsWith(m)),t=>t.amt);return v?`<div class="sub"><span>${esc(s||'No subcategory')}</span><span>${fm(v)}</span></div>`:''}).join(''):'';
+const subs=o?[...c.s,''].map(s=>{const v=-sum(S.tx.filter(t=>t.cat==c.id&&!t.ex&&(t.sub||'')==s&&t.date.startsWith(m)),t=>t.amt);return v?`<div class="sub"><span>${esc(s||'No subcategory')}</span><span>${fm(v)}</span></div>`:''}).join(''):'';
 return`<div class="row tint" ${tn(c)} data-a="op" data-id="${c.id}">${bub(c)}<div class="g1"><b>${esc(c.n)} <small style="display:inline">${c.g=='a'?'· fixed':''}</small></b><div class="bar"><i style="width:${p>0?Math.min(100,a/p*100):a>0?100:0}%;background:${bc(a,p)}"></i></div><small>Spent ${fm(a)}</small></div><div style="text-align:right"><span data-a="bed" data-id="${c.id}" class="pill" style="padding:4px 10px">${fm(p)}</span><small class="${p-a<0?'r':''}">${fm(p-a)} left</small></div></div>${subs}`}).join('');
 return hd('Budget')+nav(false)+card(`<div class="tri"><div><small>Planned</small><b>${sh0(P)}</b></div><div><small>Spent</small><b>${sh0(A)}</b></div><div><small>Left</small><b class="${P-A<0?'r':'g'}">${P-A<0?'-':''}${sh0(P-A)}</b></div></div><div class="bar"><i style="width:${P?Math.min(100,A/P*100):0}%;background:${bc(A,P)}"></i></div>`)+plain(rows)+'<small style="text-align:center">Tap a category for subcategories · tap the amount to edit the plan</small>'}
 
-function vSav(){const m=ym(),left=sum(S.tx.filter(t=>t.date.startsWith(m)),t=>t.amt)-sum(S.m.goals.flatMap(g=>g.c).filter(c=>c.d.startsWith(m)),c=>c.a);
+function vSav(){const m=ym(),left=sum(S.tx.filter(t=>t.date.startsWith(m)&&!t.ex),t=>t.amt)-sum(S.m.goals.flatMap(g=>g.c).filter(c=>c.d.startsWith(m)&&!c.tx&&!c.o),c=>c.a);
 return hd('Savings')+card(`<small>Unallocated this month</small><h2 class="${left<0?'r':'g'}">${fm(left)}</h2><small>Income minus spending minus money already set aside.</small>`)
 +S.m.goals.map(g=>{const s=sum(g.c,c=>c.a);let run=0;const tl=g.c.map((c,i)=>({...c,i})).sort((a,b)=>a.d.localeCompare(b.d)).map(c=>({...c,run:run+=c.a})).reverse();
 return card(`<div class="cov" style="${g.img?`background-image:url(${g.img})`:''}">${g.img?'':g.i}</div><div class="row" data-a="eg" data-id="${g.id}"><div class="g1"><h2>${g.i} ${esc(g.n)}</h2><small>${fm(s)} of ${fm(g.t)}</small></div><b>${g.t?Math.round(s/g.t*100):0}%</b></div><div class="bar"><i style="width:${g.t?Math.min(100,s/g.t*100):0}%"></i></div>
-<button class="pill p" data-a="cn" data-g="${g.id}" style="margin:6px 0">＋ Add money</button><div class="tl">${tl.slice(0,8).map(c=>`<div data-a="cn" data-g="${g.id}" data-i="${c.i}"><span>${c.d}</span><span class="${c.a<0?'r':'g'}">${c.a>0?'+':''}${fm(c.a)} <small style="display:inline">→ ${fm(c.run)}</small></span></div>`).join('')||'<small>No contributions yet.</small>'}</div>`)}).join('')
+<button class="pill p" data-a="cn" data-g="${g.id}" style="margin:6px 0">＋ Add money</button><div class="tl">${tl.slice(0,8).map(c=>`<div data-a="cn" data-g="${g.id}" data-i="${c.i}"><span>${c.d}${c.o?' · opening balance':''}</span><span class="${c.a<0?'r':'g'}">${c.a>0?'+':''}${fm(c.a)} <small style="display:inline">→ ${fm(c.run)}</small></span></div>`).join('')||'<small>No contributions yet.</small>'}</div>`)}).join('')
 +'<div class="act"><button class="pill" data-a="eg">＋ New goal</button></div>'}
 
 function vSet(){const m=S.m;return hd('Settings')+Object.keys(GN).filter(g=>g!='?').map(g=>card(`<div class="row"><h2 class="g1">${GN[g]}</h2><button class="pill" data-a="nc" data-g="${g}">＋ New</button></div>`+m.cats.filter(c=>c.g==g).map(c=>`<div class="row" data-a="ec" data-id="${c.id}">${bub(c)}<div class="g1"><b>${esc(c.n)}</b><small>${esc(c.s.join(', '))||'No subcategories'}</small></div>›</div>`).join(''))).join('')
@@ -285,7 +288,7 @@ close:()=>{$('#md').hidden=true},login:()=>{const e=$('#em').value.trim(),p=$('#
 auth.signInWithEmailAndPassword(e,p).catch(x=>{$('#le').textContent=/invalid|wrong|user-not-found|credential/.test(x.code)?'Wrong email or password.':x.message})},out:()=>auth.signOut(),
 ok:()=>{const t=S.tx.find(x=>x.id==$('#rv').dataset.id),c=$('#rc').value;t.rev=true;t.cat=c;txc.doc(t.id).update({rev:true,cat:c});rev()},skip:()=>{S.ri++;rev()},
 stx:e=>{const a=+$('#fa').value;if(!a)return;const id=e.dataset.id,t={date:$('#fd').value,amt:($('#ft').value=='i'?1:-1)*a,cat:$('#fc').value,sub:$('#fs').value,desc:$('#fn').value,rec:$('#fr').value,rev:true};
-(id?txc.doc(id):txc.doc()).set(t,{merge:true});H.close()},dtx:e=>{txc.doc(e.dataset.id).delete();H.close()},
+(id?txc.doc(id):txc.doc()).set(t,{merge:true});H.close()},dtx:e=>{txc.doc(e.dataset.id).delete();syncFrom(e.dataset.id,{});H.close()},
 op:e=>{if(e.dataset.id)S.open[e.dataset.id]=!S.open[e.dataset.id];render()},
 bed:e=>{event.stopPropagation();const id=e.dataset.id,b=S.m.bud[id]||{a:0,r:false};sheet(`<h2>${esc(cat(id).n)} budget</h2><input id="ba" type="number" inputmode="decimal" placeholder="Monthly amount" value="${b.a||''}"><select id="br"><option value="0">Start fresh each month</option><option value="1" ${b.r?'selected':''}>Roll over what’s left</option></select><button class="btn" data-a="sb" data-id="${id}">Save</button>`)},
 sb:e=>{S.m.bud[e.dataset.id]={a:+$('#ba').value||0,r:$('#br').value=='1'};saveM();H.close();render()},
@@ -299,9 +302,9 @@ sg:e=>{const v={n:$('#gn').value.trim(),i:$('#gi').value,t:+$('#gt').value||0,im
 if(g)Object.assign(g,v);else S.m.goals.push({id:'g'+Date.now(),c:[],...v});saveM();H.close();render()},
 dg:e=>{if(confirm('Delete this goal and its history?')){S.m.goals=S.m.goals.filter(g=>g.id!=e.dataset.id);saveM();H.close();render()}},
 cn:e=>{const g=S.m.goals.find(x=>x.id==e.dataset.g),i=e.dataset.i,c=i!=null?g.c[i]:{d:iso(new Date),a:''};
-sheet(`<h2>${esc(g.n)}</h2><input id="ca" type="number" step="0.01" inputmode="decimal" placeholder="Amount (negative to withdraw)" value="${c.a}"><input id="cd" type="date" value="${c.d}">
+sheet(`<h2>${esc(g.n)}</h2><input id="ca" type="number" step="0.01" inputmode="decimal" placeholder="Amount (negative to withdraw)" value="${c.a}"><input id="cd" type="date" value="${c.d}"><label class="sw"><span>Money I already had (opening balance)</span><input type="checkbox" id="co" ${c.o?'checked':''}></label>
 <div class="row2"><button class="btn" data-a="sk" data-g="${g.id}" data-i="${i??''}">Save</button>${i!=null?`<button class="btn d" data-a="dk" data-g="${g.id}" data-i="${i}">Delete</button>`:''}</div>`)},
-sk:e=>{const g=S.m.goals.find(x=>x.id==e.dataset.g),c={d:$('#cd').value,a:+$('#ca').value};if(!c.a)return;if(e.dataset.i!=='')g.c[e.dataset.i]=c;else g.c.push(c);saveM();H.close();render()},
+sk:e=>{const g=S.m.goals.find(x=>x.id==e.dataset.g),c={d:$('#cd').value,a:+$('#ca').value,o:$('#co').checked};if(!c.a)return;if(e.dataset.i!=='')g.c[e.dataset.i]={...g.c[e.dataset.i],...c};else g.c.push(c);saveM();H.close();render()},
 dk:e=>{S.m.goals.find(x=>x.id==e.dataset.g).c.splice(+e.dataset.i,1);saveM();H.close();render()}};
 // ---- v2: subcategories, tags, new add sheet, jump-to picker
 const SUBS={asubscriptions:'Streaming,Software,Apps,Gym & Fitness,Courses',vhouse:'Rent,Laundry',vgroceries:'Coop,Migros',veatingout:'Meal,Dessert,Drinks',vhealth:'Pharmacy,Doctor,Optician',
@@ -312,9 +315,9 @@ if(m.v<3){m.bud=m.bud||{};const B={vhouse:496.67,vgroceries:350,vhealth:150,vtra
 for(const k in B)if(!(m.bud[k]&&m.bud[k].a))m.bud[k]={a:B[k],r:false};m.v=3}if(m.v<4){const C={ataxes:'#b07d56',asubscriptions:'#8fc7e8',atransportation:'#4a74c2',vtransportation:'#4a74c2',vhouse:'#e8873a',veatingout:'#f0c542',vhealth:'#3b9a68',vhobbies:'#9b7fd1',vleisure:'#a6d98f',vshoppingmisc:'#ee9bb8',veducationstudy:'#b6c6d6',vgroceries:'#e0705f'};m.cats.forEach(c=>{if(C[c.id])c.c=C[c.id]});m.v=4}if(m.v<5){const C={ataxes:'#b8743a',asubscriptions:'#5cc0f5',atransportation:'#3f72e6',vtransportation:'#3f72e6',vhouse:'#ff8a1f',veatingout:'#ffcf1f',vhealth:'#1fa35a',vhobbies:'#9b6cf0',vleisure:'#8be36b',vshoppingmisc:'#ff7eb0',veducationstudy:'#9dbbdc',vgroceries:'#f0604d'};m.cats.forEach(c=>{if(C[c.id])c.c=C[c.id]});m.v=5}return m}
 const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];let X={};
 
-function txSheet(t,rv){t=t||{};X={rv:!!rv,id:t.id,orig:t.id?t:null,type:t.amt>0?'i':'e',amt:t.amt?Math.abs(t.amt):'',date:t.date||iso(new Date),cat:t.cat||'',sub:t.sub||'',tags:[...(t.tags||[])],desc:t.desc||'',rec:t.rec||'none'};
+function txSheet(t,rv){t=t||{};X={rv:!!rv,id:t.id,orig:t.id?t:null,type:t.amt>0?'i':'e',amt:t.amt?Math.abs(t.amt):'',date:t.date||iso(new Date),cat:t.cat||'',sub:t.sub||'',tags:[...(t.tags||[])],desc:t.desc||'',rec:t.rec||'none',ex:!!t.ex,from:t.from||''};
 txDraw();if(!t.id)setTimeout(()=>$('#fa')&&$('#fa').focus(),60)}
-function txSync(){if($('#fa')){X.amt=$('#fa').value;X.date=$('#fd').value;X.desc=$('#fn').value;X.rec=$('#fr').value}}
+function txSync(){if($('#fa')){X.amt=$('#fa').value;X.date=$('#fd').value;X.desc=$('#fn').value;X.rec=$('#fr').value;X.from=$('#fg')?$('#fg').value:'';X.ex=$('#fx').checked||!!X.from}}
 function barHtml(){const c=X.cat;if(!c||X.type=='i')return'';const k=cat(c),m=(X.date||iso(new Date)).slice(0,7),b=S.m.bud[c];
 if(!b||!b.a)return`<div class="bgt"><small style="padding:12px 16px">No budget set for ${esc(k.n)} yet – set one in Budget.</small></div>`;
 const p=b.a+carry(c,m),o=X.orig&&X.orig.cat==c&&X.orig.date.startsWith(m)?X.orig.amt:0,t=sp(c,m)+o+(+X.amt||0),pc=p>0?Math.round(t/p*100):100;
@@ -326,6 +329,7 @@ ${X.rv?`<div class="rv" id="rv"><small>${X.orig.date} · ${S.tx.filter(t=>!t.rev
 <div class="sec"><select id="fc"><option value="">Choose category…</option>${gs.map(g=>`<optgroup label="${GN[g]}">${cs.filter(c=>c.g==g).map(c=>`<option value="${c.id}" ${c.id==X.cat?'selected':''}>${c.i} ${esc(c.n)}</option>`).join('')}</optgroup>`).join('')}</select>
 ${X.cat?`<div class="chips">${k.s.map(s=>`<button data-a="ts" data-v="${esc(s)}" class="tab ${s==X.sub?'on':''}">${esc(s)}</button>`).join('')}<button data-a="ns" class="tab">＋ Sub</button></div>`:''}</div>
 <div class="sec"><input id="fn" placeholder="Add a description…" value="${esc(X.desc)}"><div class="row2"><input id="fd" type="date" value="${X.date}"><select id="fr"><option value="none">One-off</option><option value="monthly" ${X.rec=='monthly'?'selected':''}>Monthly bill</option><option value="annual" ${X.rec=='annual'?'selected':''}>Annual bill</option></select></div></div>
+<div class="sec"><label class="sw"><span>Exclude from statistics</span><input type="checkbox" id="fx" ${X.ex||X.from?'checked':''}></label>${i?'':`<select id="fg"><option value="">Not paid from savings</option>${S.m.goals.map(g=>`<option value="${g.id}" ${X.from==g.id?'selected':''}>Paid from: ${g.i} ${esc(g.n)}</option>`).join('')}</select>`}<small>Stays in your list, but doesn’t count in balance, budget or Flow. “Paid from” also withdraws it from that savings goal.</small></div>
 <div class="chips">${S.m.tags.map(g=>`<button data-a="tg" data-v="${esc(g)}" class="tab ${X.tags.includes(g)?'on':''}">#${esc(g)}</button>`).join('')}<button data-a="nt" class="tab">＋ Tag</button></div>
 ${X.rv?`<div class="row2"><button class="btn d" data-a="skip" style="color:var(--tx)">Skip</button><button class="btn" data-a="ok">Approve</button></div><button class="pill" data-a="dtx" data-id="${X.id}" style="color:var(--r);justify-self:center">Delete transaction</button>`:`<div class="row2"><button class="btn" data-a="stx">Save</button>${X.id?`<button class="btn d" data-a="dtx" data-id="${X.id}">Delete</button>`:''}</div>`}`);if(X.rv)bindRv()}
 document.addEventListener('change',e=>{if(e.target.id=='fc'){txSync();X.cat=e.target.value;X.sub='';txDraw()}});
@@ -341,7 +345,7 @@ Object.assign(H,{tty:e=>{txSync();X.type=e.dataset.v;if((cat(X.cat).g=='i')!=(X.
 tc:e=>{txSync();X.cat=e.dataset.id;X.sub='';txDraw()},ts:e=>{txSync();X.sub=X.sub==e.dataset.v?'':e.dataset.v;txDraw()},
 tg:e=>{txSync();const v=e.dataset.v,i=X.tags.indexOf(v);i<0?X.tags.push(v):X.tags.splice(i,1);txDraw()},
 nt:()=>{txSync();const v=(prompt('New tag name')||'').trim();if(!v)return;if(!S.m.tags.includes(v)){S.m.tags.push(v);saveM()}if(!X.tags.includes(v))X.tags.push(v);txDraw()},
-stx:()=>{txSync();const a=+X.amt;if(!a)return;const t={date:X.date,amt:(X.type=='i'?1:-1)*a,cat:X.cat,sub:X.sub,desc:X.desc,rec:X.rec,tags:X.tags,rev:true};(X.id?txc.doc(X.id):txc.doc()).set(t,{merge:true});H.close()},
+stx:()=>{txSync();const a=+X.amt;if(!a)return;const t={date:X.date,amt:(X.type=='i'?1:-1)*a,cat:X.cat,sub:X.sub,desc:X.desc,rec:X.rec,tags:X.tags,ex:X.ex,from:X.from,rev:true};const r=X.id?txc.doc(X.id):txc.doc();r.set(t,{merge:true});syncFrom(r.id,t);H.close()},
 nt2:()=>{const v=(prompt('New tag name')||'').trim();if(v&&!S.m.tags.includes(v)){S.m.tags.push(v);saveM();render()}},
 dtg:e=>{if(confirm('Remove this tag from the list? Past transactions keep it.')){S.m.tags=S.m.tags.filter(g=>g!=e.dataset.v);saveM();render()}},
 pick:()=>{S.py=S.d.getFullYear();pick()},pmode:e=>{S.rng=e.dataset.v;render();pick()},pq:e=>{S.d=new Date();if(S.tab=='tx'||S.tab=='rep')S.rng=e.dataset.v;render();H.close()},
@@ -349,12 +353,13 @@ py:e=>{S.py+=+e.dataset.k;pick()},pm:e=>{S.d=new Date(S.py,+e.dataset.i,1);rende
 document.addEventListener('input',e=>{if(e.target.id=='fa'||e.target.id=='fd'){txSync();const b=$('#bar');if(b)b.innerHTML=barHtml()}});
 document.addEventListener('change',e=>{if(e.target.id=='pd'&&e.target.value){S.d=new Date(e.target.value+'T12:00');render();H.close()}});
 
-Object.assign(H,{ok:()=>{txSync();const a=+X.amt;if(!a){alert('Enter an amount first.');return}const d={date:X.date,amt:(X.type=='i'?1:-1)*a,cat:X.cat,sub:X.sub,desc:X.desc,rec:X.rec,tags:X.tags,rev:true};
-txc.doc(X.id).set(d,{merge:true});const t=S.tx.find(x=>x.id==X.id);if(t)Object.assign(t,d);render();rev()},
-dtx:e=>{txc.doc(e.dataset.id).delete();if(X.rv){S.tx=S.tx.filter(x=>x.id!=e.dataset.id);render();rev()}else H.close()}});
+Object.assign(H,{ok:()=>{txSync();const a=+X.amt;if(!a){alert('Enter an amount first.');return}const d={date:X.date,amt:(X.type=='i'?1:-1)*a,cat:X.cat,sub:X.sub,desc:X.desc,rec:X.rec,tags:X.tags,ex:X.ex,from:X.from,rev:true};
+txc.doc(X.id).set(d,{merge:true});syncFrom(X.id,d);const t=S.tx.find(x=>x.id==X.id);if(t)Object.assign(t,d);render();rev()},
+dtx:e=>{txc.doc(e.dataset.id).delete();syncFrom(e.dataset.id,{});if(X.rv){S.tx=S.tx.filter(x=>x.id!=e.dataset.id);render();rev()}else H.close()}});
 Object.assign(H,{ns:()=>{txSync();const v=(prompt('New subcategory name')||'').trim(),c=S.m.cats.find(x=>x.id==X.cat);if(!v||!c)return;if(!c.s.includes(v)){c.s.push(v);saveM()}X.sub=v;txDraw()}});
 Object.assign(H,{rtc:()=>{S.m.tabc={...DT};saveM();render()}});
 document.addEventListener('change',e=>{const k=e.target.dataset&&e.target.dataset.tc;if(k){S.m.tabc={...DT,...(S.m.tabc||{}),[k]:e.target.value};saveM();render()}});
+function syncFrom(id,t){let ch=false;S.m.goals.forEach(g=>{const n=g.c.length;g.c=g.c.filter(c=>c.tx!=id);if(g.c.length!=n)ch=true});const g=t.from&&S.m.goals.find(x=>x.id==t.from);if(g){g.c.push({d:t.date,a:-Math.abs(t.amt),tx:id});ch=true}if(ch)saveM()}
 document.addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(el&&H[el.dataset.a])H[el.dataset.a](el)});
 document.addEventListener('keydown',e=>{if(e.key=='Enter'&&(e.target.id=='pw'||e.target.id=='em'))H.login()});
 document.addEventListener('change',e=>{const t=e.target;
