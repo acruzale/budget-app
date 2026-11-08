@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0c0f"><title>Flow – budget</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0f12;--s1:#171a1f;--s2:#22262d;--tx:#f3f0ea;--mu:#8e939d;--ac:#8a9a5b;--g:#5fd3a0;--r:#ff6b7a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;margin:0;font:inherit}
+body{background:var(--bg);color:var(--tx);font:15px/1.4 'DM Sans',system-ui,sans-serif;padding-bottom:110px}
+button{color:inherit;background:none;border:0;cursor:pointer}
+input,select{background:var(--s2);color:var(--tx);border:0;border-radius:16px;padding:12px 14px;width:100%}
+main{max-width:560px;margin:auto;padding:0 16px}
+header{display:flex;justify-content:space-between;align-items:center;padding:18px 0 4px}
+h1,h2{font-family:Fraunces,Georgia,serif;font-weight:600}h1{font-size:30px}h2{font-size:22px}
+.ic{width:40px;height:40px;border-radius:50%;background:var(--s1);font-size:18px}
+.card{background:var(--s1);border-radius:28px;padding:18px;margin:12px 0}
+.bub{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;font-style:normal;font-size:20px;flex:none}
+.row{display:flex;align-items:center;gap:12px;padding:9px 0;cursor:pointer}.row2{display:flex;gap:8px}
+.g1{flex:1;min-width:0}.g1>b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+small{color:var(--mu);display:block;font-size:12.5px}.g{color:var(--g)}.r{color:var(--r)}
+.seg{display:flex;background:var(--s2);border-radius:99px;padding:3px}
+.seg button{flex:1;padding:7px 10px;border-radius:99px;color:var(--mu)}.seg .on{background:var(--ac);color:#12160b;font-weight:700}
+.nav{display:grid;gap:10px;margin:10px 0}.mv{display:flex;justify-content:space-between;align-items:center}.mv button{font-size:24px;padding:0 14px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cal u{text-decoration:none;color:var(--mu);font-size:12px}
+.cal button{aspect-ratio:1/1.2;border-radius:14px;background:var(--s2);font-size:9.5px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.2}
+.cal b{font-size:13px;font-weight:500}.cal em{font-style:normal}.cal .td{outline:2px solid var(--ac)}
+.tri{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;text-align:center}
+.tri div{background:var(--s2);border-radius:20px;padding:10px 4px}.tri b{display:block;font-size:15px}
+.bar{height:10px;border-radius:9px;background:var(--s2);overflow:hidden;margin:8px 0}.bar i{display:block;height:100%;border-radius:9px;background:var(--g)}
+.act{display:flex;gap:8px;margin:12px 0;overflow-x:auto}.pill{background:var(--s1);border-radius:99px;padding:9px 16px;white-space:nowrap}
+.pill.p{background:var(--ac);color:#12160b;font-weight:700}
+nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom,0px));display:flex;background:#1c2026ee;backdrop-filter:blur(16px);border-radius:99px;padding:6px;width:min(560px,calc(100% - 24px));z-index:5}
+nav[hidden],#md[hidden]{display:none}
+nav button{flex:1;padding:7px 0;border-radius:99px;font-size:10.5px;color:var(--mu);display:grid;justify-items:center}nav .on{background:var(--s2);color:var(--tx)}nav span{font-size:18px}
+#md{position:fixed;inset:0;z-index:9;display:flex;align-items:flex-end;justify-content:center}
+.bk{position:absolute;inset:0;background:#000a}
+.pn{position:relative;background:var(--s1);width:min(560px,100%);max-height:90vh;overflow:auto;border-radius:28px 28px 0 0;padding:20px 18px calc(24px + env(safe-area-inset-bottom,0px));display:grid;gap:10px}
+.btn{background:var(--ac);color:#12160b;font-weight:700;border-radius:99px;padding:13px;flex:1}.btn.d{background:var(--s2);color:var(--r)}
+.rv{background:var(--s2);border:2px solid transparent;border-radius:28px;padding:22px;display:grid;gap:10px;touch-action:pan-y;user-select:none;transition:transform .15s}
+.big{font:600 34px Fraunces,serif}.chips{display:flex;flex-wrap:wrap;gap:6px}.chips button{font-size:20px;background:var(--s2);border-radius:12px;padding:4px 8px}
+.cov{height:110px;border-radius:20px;background:linear-gradient(135deg,var(--s2),#2d2a30) center/cover;display:grid;place-items:center;font-size:40px}
+.tl{border-left:2px solid var(--s2);margin-left:6px;padding-left:14px}.tl div{padding:5px 0;display:flex;justify-content:space-between;cursor:pointer}
+.sub{padding:6px 0 6px 54px;display:flex;justify-content:space-between;color:var(--mu);font-size:13.5px}
+.cc button,.tab{display:flex;align-items:center;gap:6px;font-size:14px;background:var(--s2);border-radius:99px;padding:7px 12px;white-space:nowrap}
+.chips .tab{padding:7px 14px}.cc .on,.tab.on{background:var(--ac);color:#12160b;font-weight:700}
+.cc{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}
+.amt{text-align:center}.amt div{display:flex;justify-content:center;align-items:baseline;gap:8px}.amt span{color:var(--mu);font-size:22px}
+.amt input{background:none;font:500 52px Fraunces,Georgia,serif;width:60%;text-align:center;padding:0}
+.bgt{position:relative;border-radius:20px;overflow:hidden;background:var(--s2)}.bgt .fl{position:absolute;inset:0 auto 0 0;background:var(--c);opacity:.28}
+.bgt .bt{position:relative;display:flex;justify-content:space-between;padding:12px 16px}.bgt b{display:block}
+.sec{background:var(--s2);border-radius:22px;padding:12px;display:grid;gap:8px}.sec input,.sec select{background:var(--s1)}
+.mg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.mg button{background:var(--s2);border-radius:16px;padding:12px 0}.mg .on{background:var(--ac);color:#12160b;font-weight:700}
+/* ---- look pass: quieter surfaces, one accent, serif numbers ---- */
+:root{--bg:#0b0c0f;--s1:#16181c;--s2:#1f2227;--line:#ffffff0d;--tx:#f4f1ec;--mu:#8d929b;--ac:#8a9a5b;--g:#62d6a4;--r:#ff6f7d;--am:#e3b341}
+body{-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+button{transition:transform .12s,background .2s}button:active{transform:scale(.97)}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+header{padding:24px 0 6px}h1{font-size:36px;font-weight:500;letter-spacing:-.025em}h2{font-size:23px;font-weight:500;letter-spacing:-.015em}
+.ic{border:1px solid var(--line);color:var(--mu)}
+.card{border:1px solid var(--line);border-radius:30px;padding:20px;margin:14px 0}
+.bub{box-shadow:inset 0 0 0 1px #ffffff14}
+.row{padding:11px 0;border-bottom:1px solid var(--line)}.row:last-child{border-bottom:0}
+input,select{border:1px solid var(--line);padding:13px 15px}
+input:focus,select:focus{outline:0;border-color:#8a9a5b66}
+.seg{border:1px solid var(--line)}.seg .on{background:#33373e;color:var(--tx);font-weight:500;box-shadow:inset 0 1px 0 #ffffff12}
+.mv b{font:500 19px Fraunces,Georgia,serif;cursor:pointer}.mv button{color:var(--mu)}
+.pill{border:1px solid var(--line)}.pill.p{border-color:transparent}
+.btn{font-weight:600;box-shadow:0 6px 18px #8a9a5b30}.btn.d{box-shadow:none}
+.cal button{border:1px solid transparent;border-radius:14px}.cal .td{outline:0;border-color:var(--ac);background:#8a9a5b14}
+.tri{gap:0;margin-top:16px}.tri div{background:none;border-radius:0;padding:4px 8px}.tri div+div{border-left:1px solid var(--line)}
+.tri b{font:500 21px Fraunces,Georgia,serif;margin-top:2px}
+.bar{height:8px}.bgt{border:1px solid var(--line)}
+.cov{border-radius:22px;border:1px solid var(--line)}
+nav{background:#17191dd9;border:1px solid var(--line);box-shadow:0 14px 34px #000a}
+nav button{padding:8px 0 7px}nav span{font-size:19px}nav .on{background:#8a9a5b22;color:var(--ac)}
+.amt input{border:0;font-size:60px}
+.bk{background:#0009;backdrop-filter:blur(4px)}
+.pn{border-top:1px solid var(--line);border-radius:32px 32px 0 0;animation:up .28s cubic-bezier(.2,.8,.2,1)}
+.pn::before{content:'';width:40px;height:4px;border-radius:9px;background:#ffffff26;margin:-8px auto 4px}
+@keyframes up{from{transform:translateY(30px);opacity:0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.hero{text-align:center;padding:26px 20px 22px}.hb{font:500 52px/1.05 Fraunces,Georgia,serif;letter-spacing:-.03em;margin:6px 0 12px}
+.hs{display:flex;justify-content:center;gap:20px;font-size:14px}
+.row.tint{border:1px solid transparent;border-radius:22px;padding:11px 14px;margin:7px 0}
+/* ---- typography: Inter for everything, Fraunces only for tab titles ---- */
+body,input,select,button{font-family:Inter,system-ui,-apple-system,sans-serif}
+h2{font:600 20px/1.25 Inter,system-ui,sans-serif;letter-spacing:-.01em}
+.big,.mv b,.tri b,.hb,.amt input{font-family:Inter,system-ui,sans-serif}
+.mv b{font-weight:600;font-size:17px}.tri b{font-weight:600;font-size:20px;letter-spacing:-.01em}
+.hb{font-weight:600;font-size:50px;letter-spacing:-.035em}.amt input{font-weight:600;font-size:56px;letter-spacing:-.03em}.big{font-weight:600}
+.g1>b{font-weight:600}
+/* ---- unboxed lists + flow layout ---- */
+.plain{margin:14px 0}
+.fi{margin-bottom:12px}.fi small{display:block}.fi b{font-size:22px;font-weight:600;letter-spacing:-.015em}
+.fg{display:grid;grid-template-columns:minmax(0,1fr) clamp(130px,38%,190px);gap:10px}
+.fl{position:relative}
+.fl-r,.fl-h{position:absolute;left:0;right:0;display:flex;align-items:center}
+.fl-r b,.fl-h b{display:block;font-weight:600;font-size:13.5px;line-height:1.25}
+.fl-r span,.fl-h span{display:block;font-size:13px;color:var(--mu)}
+.fl-h b{font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.rv{padding:14px 16px;border-radius:22px;gap:2px}.rv b{display:block;font-weight:600}
+/* ---- compact header / summary ---- */
+header{padding:18px 0 2px}h1{font-size:30px}.hr{display:flex;align-items:center;gap:8px}
+.ic{width:36px;height:36px;font-size:16px}
+.seg.sm{flex:none;padding:2px}.seg.sm button{padding:6px 11px;font-size:13px}
+.nav{margin:2px 0 4px}.mv b{font-size:15px}.mv button{font-size:20px;padding:0 12px}
+.hero{padding:14px 16px;margin:8px 0}.hero small{font-size:12.5px}.hb{font-size:32px;margin:2px 0 6px;letter-spacing:-.025em}.hs{font-size:13px;gap:14px}
+.card:has(>.tri){padding:14px 16px;margin:8px 0}.tri{margin-top:4px}.tri b{font-size:17px}.tri div{padding:2px 8px}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:4px 0 6px}
+.mv{justify-content:flex-start;gap:2px}.mv button{padding:0 8px}
+/* ---- coloured tab headers ---- */
+:root{padding-top:0}
+.band{display:block;margin:0 -16px 6px;padding:calc(env(safe-area-inset-top,0px) + 16px) 16px 16px;background:var(--hc);color:var(--ink);--ink:#fff;border-radius:0 0 30px 30px}
+.band.dk{--ink:#14170d}
+.band .hrow{display:flex;justify-content:space-between;align-items:center}
+.band .ic{background:#00000030;border:0;color:var(--ink)}
+.band .nav{margin:12px 0 0}
+.band .mv b,.band .mv button{color:var(--ink)}
+.band .seg{background:#00000030;border:0}.band .seg button{color:var(--ink);opacity:.85}
+.band .seg .on{background:#fff;color:#14170d;opacity:1;font-weight:600;box-shadow:none}
+/* ---- band: square, full-bleed, first card overlaps it ---- */
+body{overflow-x:hidden}
+.band{border-radius:0;margin:0 calc(50% - 50vw) -44px;padding:calc(env(safe-area-inset-top,0px) + 16px) calc(50vw - 50%) 62px}
+.band+.card{margin-top:0;box-shadow:0 12px 30px #0007}
+</style></head><body>
+<main id="app"></main>
+<nav id="nv" hidden>
+<button data-a="tab" data-v="tx"><span>🗓️</span>Activity</button><button data-a="tab" data-v="rep"><span>🌊</span>Flow</button>
+<button data-a="tab" data-v="sub"><span>🔁</span>Bills</button><button data-a="tab" data-v="bud"><span>🎯</span>Budget</button>
+<button data-a="tab" data-v="sav"><span>🐷</span>Savings</button></nav>
+<div id="md" hidden><div class="bk" data-a="close"></div><div class="pn" id="pn"></div></div>
+<input type="file" id="csv" accept=".csv,text/csv" hidden>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+// 1) PASTE YOUR FIREBASE WEB CONFIG HERE (Project settings → Your apps)
+const FB={apiKey:"AIzaSyAwtDf6RHnrjRlU949nqtcn2wNZtlhsOhs",authDomain:"budget-7c531.firebaseapp.com",projectId:"budget-7c531",storageBucket:"budget-7c531.firebasestorage.app",messagingSenderId:"889273768949",appId:"1:889273768949:web:496c8cec62cd6d428b5ebc"};
+
+const pad=n=>String(n).padStart(2,'0'),iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fm=n=>(n<0?'-':'')+'CHF '+Math.abs(n).toLocaleString('de-CH',{minimumFractionDigits:2,maximumFractionDigits:2}),sh0=n=>Math.round(Math.abs(n)).toLocaleString('de-CH');
+const S={tab:'tx',rng:'m',d:new Date(),f:'',tx:[],m:null,open:{},ri:0};
+const GN={i:'Income',a:'Fixed Expenses',v:'Variable & Daily','?':'Uncategorized'},GC={a:'#5f9be8',v:'#ff9a3d','?':'#8e939d'};
+const EM=['🏠','🛒','🍜','🌿','🚌','🎨','🎟️','🕯️','🛍️','📚','💼','🏛️','🔁','✈️','🎁','🐶','💊','☕','🎮','💡'];
+const SEED=[['i','Job','💼','#5fd3a0'],['i','Side Job','🛠️','#7fd1ff'],['i','Friends & Family','🫶','#ffb3c7'],
+['a','Taxes','🏛️','#c9a7ff'],['a','Subscriptions','🔁','#ff9d6c'],['a','Transportation','🚆','#6cb8ff'],
+['v','House','🏠','#ff7b4a','Rent,Utilities,Furniture'],['v','Groceries','🛒','#f6c453','Migros,Coop,Other'],['v','Eating Out','🍜','#ff6b7a','Lunch,Dinner,Coffee'],
+['v','Health','🌿','#5fd3a0','Pharmacy,Doctor,Insurance'],['v','Transportation','🚌','#6cb8ff','Public transport,Fuel,Taxi'],['v','Hobbies','🎨','#c9a7ff','Sport,Creative'],
+['v','Leisure','🎟️','#ffa8e2','Cinema,Events,Trips'],['v','Date Night','🕯️','#ff8fa3'],['v','Shopping & Misc','🛍️','#8fe3d0','Clothes,Online,Other'],['v','Education & Study','📚','#e0c3fc']];
+const slug=(g,n)=>g+n.toLowerCase().replace(/[^a-z]/g,'');
+const seed=()=>migrate({cats:SEED.map(([g,n,i,c,s])=>({id:slug(g,n),g,n,i,c,s:s?s.split(','):[]})),bud:{},cut:{},start:'',
+goals:[['Emergency Fund','🛟',5000],['Pillar 3a','🏔️',7000],['Vacation & Goals','🌴',3000]].map(([n,i,t],k)=>({id:'g'+k,n,i,t,img:'',c:[]}))});
+const cat=id=>S.m.cats.find(c=>c.id===id)||{id:'',n:'Uncategorized',i:'❔',c:'#8e939d',g:'?',s:[]};
+const plain=h=>`<section class="plain">${h}</section>`;const tn=c=>`style="background:${c.c}1f;border-color:${c.c}38"`;const bub=c=>`<i class="bub" style="background:${c.c}40;color:${c.c}">${c.i}</i>`,card=h=>`<section class="card">${h}</section>`;
+const sum=(a,f)=>a.reduce((s,x)=>s+f(x),0),sp=(id,ym)=>-sum(S.tx.filter(t=>t.cat==id&&t.date.startsWith(ym)),t=>t.amt);
+const bc=(a,p)=>a>p?'var(--r)':p>0&&a>=p*.85?'var(--am)':'var(--g)';const nx=ym=>{let[y,m]=ym.split('-').map(Number);return m==12?(y+1)+'-01':y+'-'+pad(m+1)};
+const addm=(ds,n)=>{const d=new Date(ds+'T12:00');d.setMonth(d.getMonth()+n);return iso(d)};
+
+// ---- ranges
+function R(m){const d=new Date(S.d);if(m=='w'){d.setDate(d.getDate()-(d.getDay()+6)%7);const e=new Date(d);e.setDate(e.getDate()+6);return[iso(d),iso(e)]}
+if(m=='m')return[iso(new Date(d.getFullYear(),d.getMonth(),1)),iso(new Date(d.getFullYear(),d.getMonth()+1,0))];return[d.getFullYear()+'-01-01',d.getFullYear()+'-12-31']}
+const lab=m=>{const[a,b]=R(m),f=x=>x.slice(8)+'.'+x.slice(5,7);return m=='m'?S.d.toLocaleDateString('en-GB',{month:'short',year:'numeric'}):m=='y'?S.d.getFullYear():f(a)+' – '+f(b)};
+function shift(k,m){const d=S.d;if(m=='w')d.setDate(d.getDate()+7*k);else if(m=='m')d.setMonth(d.getMonth()+k,1);else d.setFullYear(d.getFullYear()+k)}
+const nav=()=>'';
+const lum=h=>{const n=parseInt(h.slice(1),16),f=v=>(v/=255)<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);return .2126*f(n>>16)+.7152*f(n>>8&255)+.0722*f(n&255)};
+const DT={tx:'#8a9a5b',rep:'#e8c547',sub:'#3b6fd1',bud:'#f08a3c',sav:'#e879a6'},tcol=t=>(S.m&&S.m.tabc&&S.m.tabc[t])||DT[t]||'#2b2f36';
+const hd=t=>{const rt=S.tab=='tx'||S.tab=='rep',m=rt?S.rng:'m',c=tcol(S.tab);return`<header class="band${lum(c)>.18?' dk':''}" style="--hc:${c}"><div class="hrow"><h1>${t}</h1><button class="ic" data-a="tab" data-v="${S.tab=='set'?'tx':'set'}">${S.tab=='set'?'✕':'⚙'}</button></div>${rt||S.tab=='bud'?`<div class="nav"><div class="mv"><button data-a="sh" data-k="-1" data-m="${m}">‹</button><b data-a="pick" style="cursor:pointer">${lab(m)} ▾</b><button data-a="sh" data-k="1" data-m="${m}">›</button></div>${rt?`<div class="seg sm">${['w','m','y'].map(x=>`<button data-a="rng" data-v="${x}" class="${S.rng==x?'on':''}">${{w:'Week',m:'Month',y:'Year'}[x]}</button>`).join('')}</div>`:''}</div>`:''}</header>`};
+const ym=()=>iso(S.d).slice(0,7);
+
+// ---- firebase
+let txc,mref,unsub=[];
+firebase.initializeApp(FB);const auth=firebase.auth(),db=firebase.firestore();db.enablePersistence({synchronizeTabs:true}).catch(()=>{});
+const saveM=()=>mref.set(S.m);
+auth.onAuthStateChanged(u=>{unsub.forEach(f=>f());unsub=[];S.m=null;$('#nv').hidden=!u;
+if(!u){$('#app').innerHTML=card('<div style="text-align:center;padding:30px 0"><h1>Flow</h1><small style="margin:6px 0 20px">Your private budget</small><div style="display:grid;gap:10px;text-align:left"><input id="em" type="email" placeholder="Email" autocomplete="username"><input id="pw" type="password" placeholder="Password" autocomplete="current-password"><small id="le" class="r"></small><button class="btn" data-a="login">Sign in</button></div></div>');return}
+const b='users/'+u.uid;txc=db.collection(b+'/tx');mref=db.doc(b+'/meta/main');
+unsub.push(txc.onSnapshot(s=>{S.tx=s.docs.map(d=>({...d.data(),id:d.id}));render()}),
+mref.onSnapshot(s=>{if(s.exists){S.m=s.data();if(!(S.m.v>=5)){migrate(S.m);saveM()}}else if(!s.metadata.fromCache){S.m=seed();saveM()}render()}))});
+
+// ---- CSV import
+function parseCSV(t){const rows=[];let r=[],f='',q=0;for(let i=0;i<t.length;i++){const c=t[i];if(q){if(c=='"'){if(t[i+1]=='"'){f+='"';i++}else q=0}else f+=c}else if(c=='"')q=1;else if(c==','||c==';'){r.push(f);f=''}else if(c=='\n'){r.push(f);rows.push(r);r=[];f=''}else if(c!='\r')f+=c}if(f||r.length){r.push(f);rows.push(r)}return rows}
+const hash=s=>{let h=5381;for(const c of s)h=((h*33)^c.charCodeAt(0))>>>0;return h.toString(36)};
+const RU=[[/COOP|MIGROS|DENNER|ALDI|LIDL|VOLG|M KREUZPLATZ/,'vgroceries'],[/SBB|ZVV|EASYRIDE|UBER|TAXI/,'vtransportation'],[/APOTHEK|PHARMA|SUN STORE|ARZT|ZAHN/,'vhealth'],
+[/RESTAURANT|CAFE|STARBUCKS|MCDONALD|KEBAB|PIZZ|SUSHI|BAECKEREI|SPRUENGLI/,'veatingout'],[/APPLE\.COM|NETFLIX|SPOTIFY|DISNEY|ADOBE|GOOGLE|YOUTUBE|ICLOUD/,'asubscriptions','monthly'],
+[/MULLER|CALZEDONIA|ETSY|ZARA|H&M|ZALANDO|IKEA|AMAZON/,'vshoppingmisc'],[/KINO|CINEMA|THEATER|TICKETCORNER/,'vleisure'],[/STEUER/,'ataxes']];
+const BK=[['Alimentation','vgroceries'],['Transports','vtransportation'],['Carburant','vtransportation'],['Véhicule','vtransportation'],['Médecin','vhealth'],['Médicaments','vhealth'],['Soins','vhealth'],['Restaurants','veatingout'],['Cinéma','vleisure'],['Sport','vhobbies'],['Multimédia','asubscriptions'],['Loyer','vhouse'],['Aménagement','vhouse']];
+function auto(r,a,b){r=r.toUpperCase();const u=RU.find(x=>x[0].test(r));
+if(a>0)return[/SWISS INTERNATIONAL SCHOOLS|LOHN|SALAIRE/.test(r)?'ijob':u?u[1]:/CR TWINT/.test(r)?'ifriendsfamily':'','none'];
+if(u)return[u[1],u[2]||'none'];const k=BK.find(x=>b.startsWith(x[0]));return[k?k[1]:'','none']}
+const clean=d=>d.replace(/^(PMT\s+)?(CARTE|TWINT|E-COM)\s+|^(CR TWINT|VIRT BANC)\s+/,'').replace(/\s+/g,' ').trim();
+async function imp(f){const rows=parseCSV((await f.text()).replace(/^\uFEFF/,'')),h=rows[0].map(x=>x.trim().toLowerCase()),ix=r=>h.findIndex(x=>r.test(x));
+const[id,ic,ids,ia]=[ix(/^date/),ix(/cat/),ix(/desc/),ix(/montant|amount/)],have=new Set(S.tx.map(t=>t.id)),seen={};let b=db.batch(),n=0;
+for(const r of rows.slice(1)){if(!r[id]||!r[ia])continue;const m=r[id].match(/(\d+)\.(\d+)\.(\d+)/),amt=parseFloat(r[ia]);if(isNaN(amt))continue;
+const date=m?(m[3].length<3?'20'+m[3]:m[3])+'-'+pad(m[2])+'-'+pad(m[1]):r[id].slice(0,10),key=date+amt+r[ids];seen[key]=(seen[key]||0)+1;
+const tid='i'+hash(key+seen[key]);if(have.has(tid))continue;const[c,rec]=auto(r[ids]||'',amt,r[ic]||'');
+b.set(txc.doc(tid),{date,amt,cat:c,sub:'',desc:clean(r[ids]||''),rec,rev:false});if(++n%400==0){await b.commit();b=db.batch()}}
+await b.commit();alert(n+' new transactions imported. Tap “Review” to check them.')}
+
+// ---- views
+function vTx(){const[a,b]=R(S.rng),fl=t=>!S.f||(S.f.startsWith('t:')?(t.tags||[]).includes(S.f.slice(2)):t.cat===S.f),T=S.tx.filter(t=>t.date>=a&&t.date<=b&&fl(t)).sort((x,y)=>y.date.localeCompare(x.date)),
+inc=sum(T.filter(t=>t.amt>0),t=>t.amt),ex=-sum(T.filter(t=>t.amt<0),t=>t.amt),nr=S.tx.filter(t=>!t.rev).length;
+const d=S.d,y=d.getFullYear(),mo=d.getMonth(),n=new Date(y,mo+1,0).getDate(),o=(new Date(y,mo,1).getDay()+6)%7,by={};
+S.tx.filter(t=>t.date.startsWith(ym())&&fl(t)).forEach(t=>{(by[t.date]=by[t.date]||{i:0,e:0})[t.amt>0?'i':'e']+=Math.abs(t.amt)});
+let c='<div class="cal">'+[...'MTWTFSS'].map(x=>`<u>${x}</u>`).join('')+'<s></s>'.repeat(o);
+for(let k=1;k<=n;k++){const ds=y+'-'+pad(mo+1)+'-'+pad(k),v=by[ds]||{};c+=`<button data-a="day" data-d="${ds}" class="${ds==iso(new Date)?'td':''}"><b>${k}</b>${v.i?`<em class="g">+${sh0(v.i)}</em>`:''}${v.e?`<em class="r">-${sh0(v.e)}</em>`:''}</button>`}
+c+='</div>';let last='',list='';
+T.forEach(t=>{if(t.date!=last){last=t.date;list+=`<small style="margin-top:8px">${new Date(t.date+'T12:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}</small>`}
+const k=cat(t.cat);list+=`<div class="row tint" ${tn(k)} data-a="edit" data-id="${t.id}">${bub(k)}<div class="g1"><b>${esc(k.n)}</b><small>${[t.desc,t.sub,...(t.tags||[]).map(x=>'#'+x),t.rec&&t.rec!='none'?'↻':'',t.rev?'':'to review'].filter(Boolean).map(esc).join(' · ')}</small></div><span class="${t.amt>0?'g':''}">${fm(t.amt)}</span></div>`});
+return hd('Activity')+nav(true)+`<section class="card hero"><small>${S.f?'Balance (filtered)':'Balance'}</small><div class="hb ${inc-ex<0?'r':''}">${fm(inc-ex)}</div><div class="hs"><span class="g">↑ ${fm(inc)} (Income)</span><span class="r">↓ ${fm(ex)} (Expenses)</span></div></section>`+`<div class="act"><button class="pill p" data-a="add">＋ Add</button><button class="pill" data-a="rev">Review${nr?' ('+nr+')':''}</button><button class="pill" data-a="imp">Import CSV</button></div>
+<select id="ff"><option value="">All categories</option>${S.m.cats.map(k=>`<option value="${k.id}" ${S.f==k.id?'selected':''}>${k.i} ${esc(k.n)} (${GN[k.g]})</option>`).join('')}<optgroup label="Tags">${S.m.tags.map(g=>`<option value="t:${esc(g)}" ${S.f=='t:'+g?'selected':''}>🏷 ${esc(g)}</option>`).join('')}</optgroup></select>`
++card(c)
++plain(list||'<small>No transactions in this period.</small>')}
+
+function vRep(){const[a,b]=R(S.rng),T=S.tx.filter(t=>t.date>=a&&t.date<=b);let I=0;const spd={};
+T.forEach(t=>{const c=S.m.cats.find(x=>x.id==t.cat);if(c?c.g=='i':t.amt>0)I+=t.amt;else{const id=t.cat||'?';spd[id]=(spd[id]||0)-t.amt}});
+const G={};for(const[id,v]of Object.entries(spd)){if(v<=0)continue;const c=cat(id),g=GN[c.g];(G[g]=G[g]||{v:0,k:[],c:GC[c.g]||'#8e939d'});G[g].v+=v;G[g].k.push([c,v])}
+const E=Object.entries(G),X=sum(E,e=>e[1].v),sv=Math.max(0,I-X),tot=Math.max(I,X)||1,mids=E.map(([n,g])=>({n,...g}));if(sv>0)mids.push({n:'Saved',c:'#62d6a4',v:sv,k:[]});
+const K=260/tot,W=200,HH=40,SL=42,poly=(x1,y1,x2,y2,h,c)=>{const m=(x1+x2)/2;return`<path d="M${x1},${y1}C${m},${y1} ${m},${y2} ${x2},${y2}V${y2+h}C${m},${y2+h} ${m},${y1+h} ${x1},${y1+h}Z" fill="${c}" fill-opacity=".4"/>`};
+let o='',L='',yl=0,ym=0,yr=0;
+mids.forEach(m=>{const h=Math.max(m.v*K,2);o+=poly(8,yl,80,ym,h,m.c)+`<rect x="80" y="${ym}" width="8" height="${h}" rx="2" fill="${m.c}"/>`;
+L+=`<div class="fl-h" style="top:${yr}px;height:${HH}px"><div><b style="color:${m.c}">${esc(m.n)}</b><span>${fm(m.v)}</span></div></div>`;yr+=HH;let yo=ym;
+m.k.sort((p,q)=>q[1]-p[1]).forEach(([c,v])=>{const hh=Math.max(v*K,2),sl=Math.max(hh+8,SL),by=yr+(sl-hh)/2;
+o+=poly(88,yo,W-8,by,hh,c.c)+`<rect x="${W-8}" y="${by}" width="8" height="${hh}" rx="2" fill="${c.c}"/>`;
+L+=`<div class="fl-r" style="top:${yr}px;height:${sl}px"><div><b>${esc(c.n)}</b><span>${fm(v)}</span></div></div>`;yo+=hh;yr+=sl});
+yl+=h;ym+=h+14;yr+=12});
+const Ht=Math.ceil(Math.max(yr,ym,yl))+2;
+return hd('Flow')+nav(true)+card(`<div class="tri"><div><small>Income</small><b class="g">${sh0(I)}</b></div><div><small>Spent</small><b class="r">${sh0(X)}</b></div><div><small>Saved</small><b>${I?Math.round((I-X)/I*100):0}%</b></div></div>`)
++plain(I||X?`<div class="fi"><small>Income</small><b>${fm(I)}</b></div><div class="fg" style="height:${Ht}px"><svg viewBox="0 0 ${W} ${Ht}" preserveAspectRatio="none" width="100%" height="${Ht}"><rect x="0" y="0" width="8" height="${yl}" rx="2" fill="#62d6a4"/>${o}</svg><div class="fl">${L}</div></div>`:'<small>Nothing to show for this period.</small>')}
+
+function series(){const m={};S.tx.filter(t=>t.rec&&t.rec!='none'&&t.amt<0).forEach(t=>{const k=t.cat+'|'+(t.desc||'').toUpperCase().replace(/[^A-Z]/g,'').slice(0,14);(m[k]=m[k]||{k,l:[]}).l.push(t)});
+const td=new Date,today=iso(td);return Object.values(m).map(s=>{s.l.sort((a,b)=>b.date.localeCompare(a.date));const t=s.l[0];s.t=t;s.yr=t.rec=='annual';
+if(s.yr){s.done=t.date.slice(0,4)==today.slice(0,4);s.due=addm(t.date,12)}else{s.done=t.date.slice(0,7)==today.slice(0,7);s.due=s.done?addm(t.date,1):today.slice(0,8)+t.date.slice(8)}
+s.days=Math.round((new Date(s.due+'T12:00')-new Date(today+'T12:00'))/864e5);return s})}
+function vSub(){const A=series(),mo=s=>s.yr?-s.t.amt/12:-s.t.amt,tm=sum(A,mo),cut=sum(A.filter(s=>S.m.cut[s.k]),mo);
+const row=s=>{const c=cat(s.t.cat),cu=S.m.cut[s.k];return`<div class="row tint" ${tn(c)}>${bub(c)}<div class="g1"><b style="${cu?'text-decoration:line-through':''}">${esc(s.t.desc||c.n)}</b><small>Every ${s.yr?'year':'month'} · ${s.done?'paid '+s.t.date.slice(5):(s.days<0?'due '+s.due.slice(5)+' (late)':'in '+s.days+' days')}</small></div><div style="text-align:right"><span>${fm(-s.t.amt)}</span><small>${fm(s.yr?-s.t.amt:-s.t.amt*12)} / year</small></div><button data-a="cut" data-k="${esc(s.k)}" title="Mark to cut">${cu?'↩︎':'✂︎'}</button></div>`};
+return hd('Bills & subscriptions')+card(`<small>Monthly cost</small><h2>${fm(tm)}</h2><small>${fm(tm*12)} per year${cut?` · cutting ✂︎ saves ${fm(cut*12)}/yr`:''}</small>`)
++card('<h2>Upcoming</h2>'+(A.filter(s=>!s.done).sort((a,b)=>a.days-b.days).map(row).join('')||'<small>Nothing upcoming.</small>'))
++card('<h2>Complete</h2>'+(A.filter(s=>s.done).map(row).join('')||'<small>None paid yet this period.</small>'))
++'<small style="text-align:center">Mark a transaction as monthly/annual to see it here.</small>'}
+
+function carry(id,m){const b=S.m.bud[id];if(!b||!b.r)return 0;let c=0,y=S.m.start||S.tx.reduce((a,t)=>t.date<a?t.date:a,'9999-99').slice(0,7),n=0;while(y<m&&n++<120){c+=b.a-sp(id,y);y=nx(y)}return c}
+function vBud(){const m=ym();let P=0,A=0;const rows=S.m.cats.filter(c=>c.g!='i').map(c=>{const b=S.m.bud[c.id]||{a:0},p=b.a+carry(c.id,m),a=sp(c.id,m);P+=p;A+=a;const o=S.open[c.id];
+const subs=o?[...c.s,''].map(s=>{const v=-sum(S.tx.filter(t=>t.cat==c.id&&(t.sub||'')==s&&t.date.startsWith(m)),t=>t.amt);return v?`<div class="sub"><span>${esc(s||'No subcategory')}</span><span>${fm(v)}</span></div>`:''}).join(''):'';
+return`<div class="row tint" ${tn(c)} data-a="op" data-id="${c.id}">${bub(c)}<div class="g1"><b>${esc(c.n)} <small style="display:inline">${c.g=='a'?'· fixed':''}</small></b><div class="bar"><i style="width:${p>0?Math.min(100,a/p*100):a>0?100:0}%;background:${bc(a,p)}"></i></div><small>Spent ${fm(a)}</small></div><div style="text-align:right"><span data-a="bed" data-id="${c.id}" class="pill" style="padding:4px 10px">${fm(p)}</span><small class="${p-a<0?'r':''}">${fm(p-a)} left</small></div></div>${subs}`}).join('');
+return hd('Budget')+nav(false)+card(`<div class="tri"><div><small>Planned</small><b>${sh0(P)}</b></div><div><small>Spent</small><b>${sh0(A)}</b></div><div><small>Left</small><b class="${P-A<0?'r':'g'}">${P-A<0?'-':''}${sh0(P-A)}</b></div></div><div class="bar"><i style="width:${P?Math.min(100,A/P*100):0}%;background:${bc(A,P)}"></i></div>`)+plain(rows)+'<small style="text-align:center">Tap a category for subcategories · tap the amount to edit the plan</small>'}
+
+function vSav(){const m=ym(),left=sum(S.tx.filter(t=>t.date.startsWith(m)),t=>t.amt)-sum(S.m.goals.flatMap(g=>g.c).filter(c=>c.d.startsWith(m)),c=>c.a);
+return hd('Savings')+card(`<small>Unallocated this month</small><h2 class="${left<0?'r':'g'}">${fm(left)}</h2><small>Income minus spending minus money already set aside.</small>`)
++S.m.goals.map(g=>{const s=sum(g.c,c=>c.a);let run=0;const tl=g.c.map((c,i)=>({...c,i})).sort((a,b)=>a.d.localeCompare(b.d)).map(c=>({...c,run:run+=c.a})).reverse();
+return card(`<div class="cov" style="${g.img?`background-image:url(${g.img})`:''}">${g.img?'':g.i}</div><div class="row" data-a="eg" data-id="${g.id}"><div class="g1"><h2>${g.i} ${esc(g.n)}</h2><small>${fm(s)} of ${fm(g.t)}</small></div><b>${g.t?Math.round(s/g.t*100):0}%</b></div><div class="bar"><i style="width:${g.t?Math.min(100,s/g.t*100):0}%"></i></div>
+<button class="pill p" data-a="cn" data-g="${g.id}" style="margin:6px 0">＋ Add money</button><div class="tl">${tl.slice(0,8).map(c=>`<div data-a="cn" data-g="${g.id}" data-i="${c.i}"><span>${c.d}</span><span class="${c.a<0?'r':'g'}">${c.a>0?'+':''}${fm(c.a)} <small style="display:inline">→ ${fm(c.run)}</small></span></div>`).join('')||'<small>No contributions yet.</small>'}</div>`)}).join('')
++'<div class="act"><button class="pill" data-a="eg">＋ New goal</button></div>'}
+
+function vSet(){const m=S.m;return hd('Settings')+Object.keys(GN).filter(g=>g!='?').map(g=>card(`<div class="row"><h2 class="g1">${GN[g]}</h2><button class="pill" data-a="nc" data-g="${g}">＋ New</button></div>`+m.cats.filter(c=>c.g==g).map(c=>`<div class="row" data-a="ec" data-id="${c.id}">${bub(c)}<div class="g1"><b>${esc(c.n)}</b><small>${esc(c.s.join(', '))||'No subcategories'}</small></div>›</div>`).join(''))).join('')
++card(`<div class="row"><h2 class="g1">Tags</h2><button class="pill" data-a="nt2">＋ New</button></div><div class="chips">${m.tags.map(g=>`<button class="tab" data-a="dtg" data-v="${esc(g)}">#${esc(g)} ✕</button>`).join('')||'<small>No tags yet.</small>'}</div>`)+card(`<h2>Tab colors</h2>${[['tx','Activity'],['rep','Flow'],['sub','Bills'],['bud','Budget'],['sav','Savings']].map(([k,n])=>`<div class="row"><span class="g1">${n}</span><input type="color" data-tc="${k}" value="${tcol(k)}" style="width:56px;height:36px;padding:3px"></div>`).join('')}<button class="pill" data-a="rtc" style="margin-top:8px">Reset to defaults</button>`)+card(`<small>Tracking starts (rollover is counted from here)</small><input type="month" id="st" value="${m.start||''}"><button class="btn d" data-a="out" style="width:100%;margin-top:12px">Sign out</button>`)}
+
+function render(){if(!S.m)return;$('#app').innerHTML=({tx:vTx,rep:vRep,sub:vSub,bud:vBud,sav:vSav,set:vSet})[S.tab]();document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v==S.tab))}
+
+// ---- sheets
+const sheet=h=>{$('#pn').innerHTML=h;$('#md').hidden=false};
+const catopts=(sel,e)=>`<option value="">${e||'Choose category…'}</option>`+S.m.cats.map(c=>`<option value="${c.id}" ${c.id==sel?'selected':''}>${c.i} ${esc(c.n)} (${GN[c.g]})</option>`).join('');
+const subopts=(id,sel)=>'<option value="">No subcategory</option>'+cat(id).s.map(s=>`<option ${s==sel?'selected':''}>${esc(s)}</option>`).join('');
+function rev(){const q=S.tx.filter(t=>!t.rev).sort((a,b)=>b.date.localeCompare(a.date));if(!q.length){sheet('<h2>All caught up ✓</h2><button class="btn" data-a="close">Done</button>');return}txSheet(q[S.ri%q.length],true)}
+function bindRv(){const el=$('#rv');if(!el)return;let x0=null,dx=0;el.onpointerdown=e=>{x0=e.clientX;el.setPointerCapture(e.pointerId)};
+el.onpointermove=e=>{if(x0==null)return;dx=e.clientX-x0;el.style.transform=`translateX(${dx}px) rotate(${dx/40}deg)`;el.style.borderColor=dx>0?'var(--g)':'var(--r)'};
+el.onpointerup=()=>{if(x0==null)return;x0=null;if(dx>90)H.ok();else if(dx<-90)H.skip();else{el.style.transform='';el.style.borderColor=''}dx=0}}
+function catSheet(c,g){c=c||{g,id:'',n:'',i:'✨',c:'#ff7b4a',s:[]};sheet(`<h2>${c.id?'Edit':'New'} category</h2><input id="cn" placeholder="Name" value="${esc(c.n)}">
+<div class="row2"><input id="ci" value="${c.i}" style="width:80px;text-align:center;font-size:22px"><input id="cc" type="color" value="${c.c}" style="height:48px;padding:4px"></div>
+<div class="chips">${EM.map(e=>`<button data-a="pe" data-v="${e}">${e}</button>`).join('')}</div><input id="cs" placeholder="Subcategories, comma separated" value="${esc(c.s.join(', '))}">
+<div class="row2"><button class="btn" data-a="sc" data-id="${c.id}" data-g="${c.g}">Save</button>${c.id?`<button class="btn d" data-a="dc" data-id="${c.id}">Delete</button>`:''}</div>`)}
+function goalSheet(g){g=g||{};S.pimg=g.img||'';sheet(`<h2>${g.id?'Edit':'New'} goal</h2><input id="gn" placeholder="Goal name" value="${esc(g.n)}"><div class="row2"><input id="gi" value="${g.i||'🎯'}" style="width:80px;text-align:center;font-size:22px"><input id="gt" type="number" placeholder="Target (CHF)" value="${g.t||''}"></div>
+<small>Photo</small><input id="gp" type="file" accept="image/*"><div class="row2"><button class="btn" data-a="sg" data-id="${g.id||''}">Save</button>${g.id?`<button class="btn d" data-a="dg" data-id="${g.id}">Delete</button>`:''}</div>`)}
+function shrink(f,cb){const r=new FileReader;r.onload=()=>{const im=new Image;im.onload=()=>{const k=Math.min(1,640/im.width),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.7))};im.src=r.result};r.readAsDataURL(f)}
+
+// ---- actions
+const H={tab:e=>{S.tab=e.dataset.v;render();scrollTo(0,0)},rng:e=>{S.rng=e.dataset.v;render()},sh:e=>{shift(+e.dataset.k,e.dataset.m);render()},
+day:e=>txSheet({date:e.dataset.d}),add:()=>txSheet(),edit:e=>txSheet(S.tx.find(t=>t.id==e.dataset.id)),rev:()=>{S.ri=0;rev()},imp:()=>$('#csv').click(),
+close:()=>{$('#md').hidden=true},login:()=>{const e=$('#em').value.trim(),p=$('#pw').value;$('#le').textContent='';if(!e||!p){$('#le').textContent='Enter your email and password.';return}
+auth.signInWithEmailAndPassword(e,p).catch(x=>{$('#le').textContent=/invalid|wrong|user-not-found|credential/.test(x.code)?'Wrong email or password.':x.message})},out:()=>auth.signOut(),
+ok:()=>{const t=S.tx.find(x=>x.id==$('#rv').dataset.id),c=$('#rc').value;t.rev=true;t.cat=c;txc.doc(t.id).update({rev:true,cat:c});rev()},skip:()=>{S.ri++;rev()},
+stx:e=>{const a=+$('#fa').value;if(!a)return;const id=e.dataset.id,t={date:$('#fd').value,amt:($('#ft').value=='i'?1:-1)*a,cat:$('#fc').value,sub:$('#fs').value,desc:$('#fn').value,rec:$('#fr').value,rev:true};
+(id?txc.doc(id):txc.doc()).set(t,{merge:true});H.close()},dtx:e=>{txc.doc(e.dataset.id).delete();H.close()},
+op:e=>{if(e.dataset.id)S.open[e.dataset.id]=!S.open[e.dataset.id];render()},
+bed:e=>{event.stopPropagation();const id=e.dataset.id,b=S.m.bud[id]||{a:0,r:false};sheet(`<h2>${esc(cat(id).n)} budget</h2><input id="ba" type="number" inputmode="decimal" placeholder="Monthly amount" value="${b.a||''}"><select id="br"><option value="0">Start fresh each month</option><option value="1" ${b.r?'selected':''}>Roll over what’s left</option></select><button class="btn" data-a="sb" data-id="${id}">Save</button>`)},
+sb:e=>{S.m.bud[e.dataset.id]={a:+$('#ba').value||0,r:$('#br').value=='1'};saveM();H.close();render()},
+cut:e=>{const k=e.dataset.k;S.m.cut[k]=!S.m.cut[k];saveM();render()},
+ec:e=>catSheet(cat(e.dataset.id)),nc:e=>catSheet(null,e.dataset.g),pe:e=>{$('#ci').value=e.dataset.v},
+sc:e=>{const v={n:$('#cn').value.trim(),i:$('#ci').value||'✨',c:$('#cc').value,s:$('#cs').value.split(',').map(x=>x.trim()).filter(Boolean)};if(!v.n)return;
+if(e.dataset.id)Object.assign(cat(e.dataset.id),v);else{let id=slug(e.dataset.g,v.n);if(S.m.cats.some(c=>c.id==id))id+=Date.now()%1000;S.m.cats.push({id,g:e.dataset.g,...v})}saveM();H.close();render()},
+dc:e=>{if(confirm('Delete this category? Its transactions become uncategorized.')){S.m.cats=S.m.cats.filter(c=>c.id!=e.dataset.id);saveM();H.close();render()}},
+eg:e=>goalSheet(S.m.goals.find(g=>g.id==e.dataset.id)),
+sg:e=>{const v={n:$('#gn').value.trim(),i:$('#gi').value,t:+$('#gt').value||0,img:S.pimg||''};if(!v.n)return;const g=S.m.goals.find(x=>x.id==e.dataset.id);
+if(g)Object.assign(g,v);else S.m.goals.push({id:'g'+Date.now(),c:[],...v});saveM();H.close();render()},
+dg:e=>{if(confirm('Delete this goal and its history?')){S.m.goals=S.m.goals.filter(g=>g.id!=e.dataset.id);saveM();H.close();render()}},
+cn:e=>{const g=S.m.goals.find(x=>x.id==e.dataset.g),i=e.dataset.i,c=i!=null?g.c[i]:{d:iso(new Date),a:''};
+sheet(`<h2>${esc(g.n)}</h2><input id="ca" type="number" step="0.01" inputmode="decimal" placeholder="Amount (negative to withdraw)" value="${c.a}"><input id="cd" type="date" value="${c.d}">
+<div class="row2"><button class="btn" data-a="sk" data-g="${g.id}" data-i="${i??''}">Save</button>${i!=null?`<button class="btn d" data-a="dk" data-g="${g.id}" data-i="${i}">Delete</button>`:''}</div>`)},
+sk:e=>{const g=S.m.goals.find(x=>x.id==e.dataset.g),c={d:$('#cd').value,a:+$('#ca').value};if(!c.a)return;if(e.dataset.i!=='')g.c[e.dataset.i]=c;else g.c.push(c);saveM();H.close();render()},
+dk:e=>{S.m.goals.find(x=>x.id==e.dataset.g).c.splice(+e.dataset.i,1);saveM();H.close();render()}};
+// ---- v2: subcategories, tags, new add sheet, jump-to picker
+const SUBS={asubscriptions:'Streaming,Software,Apps,Gym & Fitness,Courses',vhouse:'Rent,Laundry',vgroceries:'Coop,Migros',veatingout:'Meal,Dessert,Drinks',vhealth:'Pharmacy,Doctor,Optician',
+vhobbies:'Art & Photography,Crochet,Music,Board Game,Video Games,Sports,Books',vleisure:'Physical & Active,Cultural & Educational,Interactive & Social,Entertainment & Outings',
+vtransportation:'SBB,Parking,Taxi',vshoppingmisc:'Clothes & Footwear,Electronics,Personal Care,Items',veducationstudy:'Certification & Courses,Course Materials & Supplies,Workshops'};
+function migrate(m){if(!(m.v>=2)){m.cats=m.cats.filter(c=>c.id!='vdatenight');m.cats.forEach(c=>{if(SUBS[c.id])c.s=SUBS[c.id].split(',')});m.tags=m.tags||['Date Night'];m.v=2}
+if(m.v<3){m.bud=m.bud||{};const B={vhouse:496.67,vgroceries:350,vhealth:150,vtransportation:150,veatingout:100,vhobbies:80,vleisure:80,vshoppingmisc:100,ataxes:300,veducationstudy:100,asubscriptions:100};
+for(const k in B)if(!(m.bud[k]&&m.bud[k].a))m.bud[k]={a:B[k],r:false};m.v=3}if(m.v<4){const C={ataxes:'#b07d56',asubscriptions:'#8fc7e8',atransportation:'#4a74c2',vtransportation:'#4a74c2',vhouse:'#e8873a',veatingout:'#f0c542',vhealth:'#3b9a68',vhobbies:'#9b7fd1',vleisure:'#a6d98f',vshoppingmisc:'#ee9bb8',veducationstudy:'#b6c6d6',vgroceries:'#e0705f'};m.cats.forEach(c=>{if(C[c.id])c.c=C[c.id]});m.v=4}if(m.v<5){const C={ataxes:'#b8743a',asubscriptions:'#5cc0f5',atransportation:'#3f72e6',vtransportation:'#3f72e6',vhouse:'#ff8a1f',veatingout:'#ffcf1f',vhealth:'#1fa35a',vhobbies:'#9b6cf0',vleisure:'#8be36b',vshoppingmisc:'#ff7eb0',veducationstudy:'#9dbbdc',vgroceries:'#f0604d'};m.cats.forEach(c=>{if(C[c.id])c.c=C[c.id]});m.v=5}return m}
+const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];let X={};
+
+function txSheet(t,rv){t=t||{};X={rv:!!rv,id:t.id,orig:t.id?t:null,type:t.amt>0?'i':'e',amt:t.amt?Math.abs(t.amt):'',date:t.date||iso(new Date),cat:t.cat||'',sub:t.sub||'',tags:[...(t.tags||[])],desc:t.desc||'',rec:t.rec||'none'};
+txDraw();if(!t.id)setTimeout(()=>$('#fa')&&$('#fa').focus(),60)}
+function txSync(){if($('#fa')){X.amt=$('#fa').value;X.date=$('#fd').value;X.desc=$('#fn').value;X.rec=$('#fr').value}}
+function barHtml(){const c=X.cat;if(!c||X.type=='i')return'';const k=cat(c),m=(X.date||iso(new Date)).slice(0,7),b=S.m.bud[c];
+if(!b||!b.a)return`<div class="bgt"><small style="padding:12px 16px">No budget set for ${esc(k.n)} yet – set one in Budget.</small></div>`;
+const p=b.a+carry(c,m),o=X.orig&&X.orig.cat==c&&X.orig.date.startsWith(m)?X.orig.amt:0,t=sp(c,m)+o+(+X.amt||0),pc=p>0?Math.round(t/p*100):100;
+return`<div class="bgt" style="--c:${bc(t,p)}"><div class="fl" style="width:${Math.min(100,pc)}%"></div><div class="bt"><span><b>${fm(t)}</b><small>${pc}% spent</small></span><span style="text-align:right"><b style="color:var(--c)">${fm(p-t)}</b><small style="color:var(--c)">${Math.max(0,100-pc)}% left</small></span></div></div>`}
+function txDraw(){const i=X.type=='i',cs=S.m.cats.filter(c=>(c.g=='i')==i),k=cat(X.cat),gs=Object.keys(GN).filter(g=>cs.some(c=>c.g==g));
+sheet(`<div class="row2" style="align-items:center"><button class="ic" data-a="close">✕</button><div class="seg" style="flex:1"><button data-a="tty" data-v="e" class="${i?'':'on'}">Expense</button><button data-a="tty" data-v="i" class="${i?'on':''}">Income</button></div></div>
+${X.rv?`<div class="rv" id="rv"><small>${X.orig.date} · ${S.tx.filter(t=>!t.rev).length} to review</small><b>${esc(X.orig.desc)}</b><small>Swipe right to approve · left to skip</small></div>`:''}<div class="amt"><div><span>CHF</span><input id="fa" type="number" step="0.01" inputmode="decimal" placeholder="0" value="${X.amt}"></div></div>
+<div id="bar">${barHtml()}</div>
+<div class="sec"><select id="fc"><option value="">Choose category…</option>${gs.map(g=>`<optgroup label="${GN[g]}">${cs.filter(c=>c.g==g).map(c=>`<option value="${c.id}" ${c.id==X.cat?'selected':''}>${c.i} ${esc(c.n)}</option>`).join('')}</optgroup>`).join('')}</select>
+${X.cat?`<div class="chips">${k.s.map(s=>`<button data-a="ts" data-v="${esc(s)}" class="tab ${s==X.sub?'on':''}">${esc(s)}</button>`).join('')}<button data-a="ns" class="tab">＋ Sub</button></div>`:''}</div>
+<div class="sec"><input id="fn" placeholder="Add a description…" value="${esc(X.desc)}"><div class="row2"><input id="fd" type="date" value="${X.date}"><select id="fr"><option value="none">One-off</option><option value="monthly" ${X.rec=='monthly'?'selected':''}>Monthly bill</option><option value="annual" ${X.rec=='annual'?'selected':''}>Annual bill</option></select></div></div>
+<div class="chips">${S.m.tags.map(g=>`<button data-a="tg" data-v="${esc(g)}" class="tab ${X.tags.includes(g)?'on':''}">#${esc(g)}</button>`).join('')}<button data-a="nt" class="tab">＋ Tag</button></div>
+${X.rv?`<div class="row2"><button class="btn d" data-a="skip" style="color:var(--tx)">Skip</button><button class="btn" data-a="ok">Approve</button></div><button class="pill" data-a="dtx" data-id="${X.id}" style="color:var(--r);justify-self:center">Delete transaction</button>`:`<div class="row2"><button class="btn" data-a="stx">Save</button>${X.id?`<button class="btn d" data-a="dtx" data-id="${X.id}">Delete</button>`:''}</div>`}`);if(X.rv)bindRv()}
+document.addEventListener('change',e=>{if(e.target.id=='fc'){txSync();X.cat=e.target.value;X.sub='';txDraw()}});
+
+function pick(){const rt=S.tab=='tx'||S.tab=='rep',m=rt?S.rng:'m',y=S.py,cur=new Date().getFullYear();
+sheet(`<h2>Jump to</h2>${rt?`<div class="seg">${['w','m','y'].map(x=>`<button data-a="pmode" data-v="${x}" class="${m==x?'on':''}">${{w:'Week',m:'Month',y:'Year'}[x]}</button>`).join('')}</div>`:''}
+<div class="row2">${(rt?['w','m','y']:['m']).map(x=>`<button class="btn d" style="color:var(--tx)" data-a="pq" data-v="${x}">This ${{w:'week',m:'month',y:'year'}[x]}</button>`).join('')}</div>
+${m=='m'?`<div class="mv"><button data-a="py" data-k="-1">‹</button><b>${y}</b><button data-a="py" data-k="1">›</button></div><div class="mg">${MN.map((n,i)=>`<button data-a="pm" data-i="${i}" class="${i==S.d.getMonth()&&y==S.d.getFullYear()?'on':''}">${n}</button>`).join('')}</div>`
+:m=='y'?`<div class="mg">${[...Array(8)].map((_,i)=>cur-6+i).map(v=>`<button data-a="pyr" data-v="${v}" class="${v==S.d.getFullYear()?'on':''}">${v}</button>`).join('')}</div>`
+:'<small>Pick any day and you’ll see its week.</small><input type="date" id="pd" value="'+iso(S.d)+'">'}`)}
+
+Object.assign(H,{tty:e=>{txSync();X.type=e.dataset.v;if((cat(X.cat).g=='i')!=(X.type=='i')){X.cat='';X.sub=''}txDraw()},
+tc:e=>{txSync();X.cat=e.dataset.id;X.sub='';txDraw()},ts:e=>{txSync();X.sub=X.sub==e.dataset.v?'':e.dataset.v;txDraw()},
+tg:e=>{txSync();const v=e.dataset.v,i=X.tags.indexOf(v);i<0?X.tags.push(v):X.tags.splice(i,1);txDraw()},
+nt:()=>{txSync();const v=(prompt('New tag name')||'').trim();if(!v)return;if(!S.m.tags.includes(v)){S.m.tags.push(v);saveM()}if(!X.tags.includes(v))X.tags.push(v);txDraw()},
+stx:()=>{txSync();const a=+X.amt;if(!a)return;const t={date:X.date,amt:(X.type=='i'?1:-1)*a,cat:X.cat,sub:X.sub,desc:X.desc,rec:X.rec,tags:X.tags,rev:true};(X.id?txc.doc(X.id):txc.doc()).set(t,{merge:true});H.close()},
+nt2:()=>{const v=(prompt('New tag name')||'').trim();if(v&&!S.m.tags.includes(v)){S.m.tags.push(v);saveM();render()}},
+dtg:e=>{if(confirm('Remove this tag from the list? Past transactions keep it.')){S.m.tags=S.m.tags.filter(g=>g!=e.dataset.v);saveM();render()}},
+pick:()=>{S.py=S.d.getFullYear();pick()},pmode:e=>{S.rng=e.dataset.v;render();pick()},pq:e=>{S.d=new Date();if(S.tab=='tx'||S.tab=='rep')S.rng=e.dataset.v;render();H.close()},
+py:e=>{S.py+=+e.dataset.k;pick()},pm:e=>{S.d=new Date(S.py,+e.dataset.i,1);render();H.close()},pyr:e=>{S.d=new Date(+e.dataset.v,S.d.getMonth(),1);S.rng='y';render();H.close()}});
+document.addEventListener('input',e=>{if(e.target.id=='fa'||e.target.id=='fd'){txSync();const b=$('#bar');if(b)b.innerHTML=barHtml()}});
+document.addEventListener('change',e=>{if(e.target.id=='pd'&&e.target.value){S.d=new Date(e.target.value+'T12:00');render();H.close()}});
+
+Object.assign(H,{ok:()=>{txSync();const a=+X.amt;if(!a){alert('Enter an amount first.');return}const d={date:X.date,amt:(X.type=='i'?1:-1)*a,cat:X.cat,sub:X.sub,desc:X.desc,rec:X.rec,tags:X.tags,rev:true};
+txc.doc(X.id).set(d,{merge:true});const t=S.tx.find(x=>x.id==X.id);if(t)Object.assign(t,d);render();rev()},
+dtx:e=>{txc.doc(e.dataset.id).delete();if(X.rv){S.tx=S.tx.filter(x=>x.id!=e.dataset.id);render();rev()}else H.close()}});
+Object.assign(H,{ns:()=>{txSync();const v=(prompt('New subcategory name')||'').trim(),c=S.m.cats.find(x=>x.id==X.cat);if(!v||!c)return;if(!c.s.includes(v)){c.s.push(v);saveM()}X.sub=v;txDraw()}});
+Object.assign(H,{rtc:()=>{S.m.tabc={...DT};saveM();render()}});
+document.addEventListener('change',e=>{const k=e.target.dataset&&e.target.dataset.tc;if(k){S.m.tabc={...DT,...(S.m.tabc||{}),[k]:e.target.value};saveM();render()}});
+document.addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(el&&H[el.dataset.a])H[el.dataset.a](el)});
+document.addEventListener('keydown',e=>{if(e.key=='Enter'&&(e.target.id=='pw'||e.target.id=='em'))H.login()});
+document.addEventListener('change',e=>{const t=e.target;
+if(t.id=='ff'){S.f=t.value;render()}
+else if(t.id=='st'){S.m.start=t.value;saveM()}else if(t.id=='gp'&&t.files[0])shrink(t.files[0],u=>S.pimg=u);
+else if(t.id=='csv'&&t.files[0]){imp(t.files[0]);t.value=''}});
+</script></body></html>
