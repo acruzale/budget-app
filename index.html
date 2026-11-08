@@ -123,6 +123,10 @@ header{padding:18px 0 2px}h1{font-size:30px}.hr{display:flex;align-items:center;
 body{overflow-x:hidden}
 .band{border-radius:0;margin:0 calc(50% - 50vw) -44px;padding:calc(env(safe-area-inset-top,0px) + 16px) calc(50vw - 50%) 62px}
 .band+.card{margin-top:0;box-shadow:0 12px 30px #0007}
+.seg button[data-a="tty"].on{color:#14170d;font-weight:600}
+.seg button[data-a="tty"][data-v="e"].on{background:var(--r)}
+.seg button[data-a="tty"][data-v="i"].on{background:var(--g)}
+.amt.exp input{color:var(--r)}.amt.inc input{color:var(--g)}
 </style></head><body>
 <main id="app"></main>
 <nav id="nv" hidden>
@@ -317,7 +321,7 @@ const p=b.a+carry(c,m),o=X.orig&&X.orig.cat==c&&X.orig.date.startsWith(m)?X.orig
 return`<div class="bgt" style="--c:${bc(t,p)}"><div class="fl" style="width:${Math.min(100,pc)}%"></div><div class="bt"><span><b>${fm(t)}</b><small>${pc}% spent</small></span><span style="text-align:right"><b style="color:var(--c)">${fm(p-t)}</b><small style="color:var(--c)">${Math.max(0,100-pc)}% left</small></span></div></div>`}
 function txDraw(){const i=X.type=='i',cs=S.m.cats.filter(c=>(c.g=='i')==i),k=cat(X.cat),gs=Object.keys(GN).filter(g=>cs.some(c=>c.g==g));
 sheet(`<div class="row2" style="align-items:center"><button class="ic" data-a="close">✕</button><div class="seg" style="flex:1"><button data-a="tty" data-v="e" class="${i?'':'on'}">Expense</button><button data-a="tty" data-v="i" class="${i?'on':''}">Income</button></div></div>
-${X.rv?`<div class="rv" id="rv"><small>${X.orig.date} · ${S.tx.filter(t=>!t.rev).length} to review</small><b>${esc(X.orig.desc)}</b><small>Swipe right to approve · left to skip</small></div>`:''}<div class="amt"><div><span>CHF</span><input id="fa" type="number" step="0.01" inputmode="decimal" placeholder="0" value="${X.amt}"></div></div>
+${X.rv?`<div class="rv" id="rv"><small>${X.orig.date} · ${S.tx.filter(t=>!t.rev).length} to review</small><b>${esc(X.orig.desc)}</b><small>Swipe right to approve · left to skip</small></div>`:''}<div class="amt ${i?'inc':'exp'}"><div><span>CHF</span><input id="fa" type="number" step="0.01" inputmode="decimal" placeholder="0" value="${X.amt}"></div></div>
 <div id="bar">${barHtml()}</div>
 <div class="sec"><select id="fc"><option value="">Choose category…</option>${gs.map(g=>`<optgroup label="${GN[g]}">${cs.filter(c=>c.g==g).map(c=>`<option value="${c.id}" ${c.id==X.cat?'selected':''}>${c.i} ${esc(c.n)}</option>`).join('')}</optgroup>`).join('')}</select>
 ${X.cat?`<div class="chips">${k.s.map(s=>`<button data-a="ts" data-v="${esc(s)}" class="tab ${s==X.sub?'on':''}">${esc(s)}</button>`).join('')}<button data-a="ns" class="tab">＋ Sub</button></div>`:''}</div>
