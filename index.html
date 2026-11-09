@@ -130,6 +130,7 @@ body{overflow-x:hidden}
 .sw{display:flex;justify-content:space-between;align-items:center;padding:2px 4px;cursor:pointer}
 .sw input{width:22px;height:22px;padding:0;accent-color:var(--ac)}
 .row.ex{opacity:.6}
+.band .ic.on{background:#fff;color:#14170d}.ic svg{display:block;margin:auto}
 </style></head><body>
 <main id="app"></main>
 <nav id="nv" hidden>
@@ -173,7 +174,7 @@ function shift(k,m){const d=S.d;if(m=='w')d.setDate(d.getDate()+7*k);else if(m==
 const nav=()=>'';
 const lum=h=>{const n=parseInt(h.slice(1),16),f=v=>(v/=255)<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);return .2126*f(n>>16)+.7152*f(n>>8&255)+.0722*f(n&255)};
 const DT={tx:'#8a9a5b',rep:'#e8c547',sub:'#3b6fd1',bud:'#f08a3c',sav:'#e879a6'},tcol=t=>(S.m&&S.m.tabc&&S.m.tabc[t])||DT[t]||'#2b2f36';
-const hd=t=>{const rt=S.tab=='tx'||S.tab=='rep',m=rt?S.rng:'m',c=tcol(S.tab);return`<header class="band${lum(c)>.18?' dk':''}" style="--hc:${c}"><div class="hrow"><h1>${t}</h1><button class="ic" data-a="tab" data-v="${S.tab=='set'?'tx':'set'}">${S.tab=='set'?'✕':'⚙'}</button></div>${rt||S.tab=='bud'?`<div class="nav"><div class="mv"><button data-a="sh" data-k="-1" data-m="${m}">‹</button><b data-a="pick" style="cursor:pointer">${lab(m)} ▾</b><button data-a="sh" data-k="1" data-m="${m}">›</button></div>${rt?`<div class="seg sm">${['w','m','y'].map(x=>`<button data-a="rng" data-v="${x}" class="${S.rng==x?'on':''}">${{w:'Week',m:'Month',y:'Year'}[x]}</button>`).join('')}</div>`:''}</div>`:''}</header>`};
+const hd=t=>{const rt=S.tab=='tx'||S.tab=='rep',m=rt?S.rng:'m',c=tcol(S.tab);return`<header class="band${lum(c)>.18?' dk':''}" style="--hc:${c}"><div class="hrow"><h1>${t}</h1><div class="hr">${S.tab=='tx'?`<button class="ic${S.f||S.fs||S.q?' on':''}" data-a="flt" aria-label="Filter and search">${FI}</button>`:''}<button class="ic" data-a="tab" data-v="${S.tab=='set'?'tx':'set'}">${S.tab=='set'?'✕':'⚙'}</button></div></div>${rt||S.tab=='bud'?`<div class="nav"><div class="mv"><button data-a="sh" data-k="-1" data-m="${m}">‹</button><b data-a="pick" style="cursor:pointer">${lab(m)} ▾</b><button data-a="sh" data-k="1" data-m="${m}">›</button></div>${rt?`<div class="seg sm">${['w','m','y'].map(x=>`<button data-a="rng" data-v="${x}" class="${S.rng==x?'on':''}">${{w:'Week',m:'Month',y:'Year'}[x]}</button>`).join('')}</div>`:''}</div>`:''}</header>`};
 const ym=()=>iso(S.d).slice(0,7);
 
 // ---- firebase
@@ -206,7 +207,7 @@ b.set(txc.doc(tid),{date,amt,cat:c,sub:'',desc:clean(r[ids]||''),rec,rev:false})
 await b.commit();alert(n+' new transactions imported. Tap “Review” to check them.')}
 
 // ---- views
-function vTx(){const[a,b]=R(S.rng),fl=t=>!S.f||(S.f.startsWith('t:')?(t.tags||[]).includes(S.f.slice(2)):t.cat===S.f),T=S.tx.filter(t=>t.date>=a&&t.date<=b&&fl(t)).sort((x,y)=>y.date.localeCompare(x.date)),
+function vTx(){const[a,b]=R(S.rng),fl=t=>(!S.f||(S.f.startsWith('t:')?(t.tags||[]).includes(S.f.slice(2)):t.cat===S.f))&&(!S.fs||t.sub===S.fs)&&(!S.q||[t.desc,t.sub,cat(t.cat).n,...(t.tags||[]),String(Math.abs(t.amt))].join(' ').toLowerCase().includes(S.q.toLowerCase())),T=S.tx.filter(t=>(S.q||(t.date>=a&&t.date<=b))&&fl(t)).sort((x,y)=>y.date.localeCompare(x.date)),
 inc=sum(T.filter(t=>t.amt>0&&!t.ex),t=>t.amt),ex=-sum(T.filter(t=>t.amt<0&&!t.ex),t=>t.amt),nr=S.tx.filter(t=>!t.rev).length;
 const d=S.d,y=d.getFullYear(),mo=d.getMonth(),n=new Date(y,mo+1,0).getDate(),o=(new Date(y,mo,1).getDay()+6)%7,by={};
 S.tx.filter(t=>t.date.startsWith(ym())&&fl(t)&&!t.ex).forEach(t=>{(by[t.date]=by[t.date]||{i:0,e:0})[t.amt>0?'i':'e']+=Math.abs(t.amt)});
@@ -215,8 +216,7 @@ for(let k=1;k<=n;k++){const ds=y+'-'+pad(mo+1)+'-'+pad(k),v=by[ds]||{};c+=`<butt
 c+='</div>';let last='',list='';
 T.forEach(t=>{if(t.date!=last){last=t.date;list+=`<small style="margin-top:8px">${new Date(t.date+'T12:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}</small>`}
 const k=cat(t.cat);list+=`<div class="row tint${t.ex?' ex':''}" ${tn(k)} data-a="edit" data-id="${t.id}">${bub(k)}<div class="g1"><b>${esc(k.n)}</b><small>${[t.desc,t.sub,...(t.tags||[]).map(x=>'#'+x),t.rec&&t.rec!='none'?'↻':'',t.ex?(t.from?'paid from savings':'excluded'):'',t.rev?'':'to review'].filter(Boolean).map(esc).join(' · ')}</small></div><span class="${t.amt>0?'g':''}">${fm(t.amt)}</span></div>`});
-return hd('Activity')+nav(true)+`<section class="card hero"><small>${S.f?'Balance (filtered)':'Balance'}</small><div class="hb ${inc-ex<0?'r':''}">${fm(inc-ex)}</div><div class="hs"><span class="g">↑ ${fm(inc)} (Income)</span><span class="r">↓ ${fm(ex)} (Expenses)</span></div></section>`+`<div class="act"><button class="pill p" data-a="add">＋ Add</button><button class="pill" data-a="rev">Review${nr?' ('+nr+')':''}</button><button class="pill" data-a="imp">Import CSV</button></div>
-<select id="ff"><option value="">All categories</option>${S.m.cats.map(k=>`<option value="${k.id}" ${S.f==k.id?'selected':''}>${k.i} ${esc(k.n)} (${GN[k.g]})</option>`).join('')}<optgroup label="Tags">${S.m.tags.map(g=>`<option value="t:${esc(g)}" ${S.f=='t:'+g?'selected':''}>🏷 ${esc(g)}</option>`).join('')}</optgroup></select>`
+return hd('Activity')+nav(true)+`<section class="card hero"><small>${S.q?'Search results · all dates':S.f||S.fs?'Balance (filtered)':'Balance'}</small><div class="hb ${inc-ex<0?'r':''}">${fm(inc-ex)}</div><div class="hs"><span class="g">↑ ${fm(inc)} (Income)</span><span class="r">↓ ${fm(ex)} (Expenses)</span></div></section>`+`<div class="act"><button class="pill p" data-a="add">＋ Add</button><button class="pill" data-a="rev">Review${nr?' ('+nr+')':''}</button><button class="pill" data-a="imp">Import CSV</button></div>`
 +card(c)
 +plain(list||'<small>No transactions in this period.</small>')}
 
@@ -240,12 +240,12 @@ function series(){const m={};S.tx.filter(t=>t.rec&&t.rec!='none'&&t.amt<0).forEa
 const td=new Date,today=iso(td);return Object.values(m).map(s=>{s.l.sort((a,b)=>b.date.localeCompare(a.date));const t=s.l[0];s.t=t;s.yr=t.rec=='annual';
 if(s.yr){s.done=t.date.slice(0,4)==today.slice(0,4);s.due=addm(t.date,12)}else{s.done=t.date.slice(0,7)==today.slice(0,7);s.due=s.done?addm(t.date,1):today.slice(0,8)+t.date.slice(8)}
 s.days=Math.round((new Date(s.due+'T12:00')-new Date(today+'T12:00'))/864e5);return s})}
-function vSub(){const A=series(),mo=s=>s.yr?-s.t.amt/12:-s.t.amt,tm=sum(A,mo),cut=sum(A.filter(s=>S.m.cut[s.k]),mo);
-const row=s=>{const c=cat(s.t.cat),cu=S.m.cut[s.k];return`<div class="row tint" ${tn(c)}>${bub(c)}<div class="g1"><b style="${cu?'text-decoration:line-through':''}">${esc(s.t.desc||c.n)}</b><small>Every ${s.yr?'year':'month'} · ${s.done?'paid '+s.t.date.slice(5):(s.days<0?'due '+s.due.slice(5)+' (late)':'in '+s.days+' days')}</small></div><div style="text-align:right"><span>${fm(-s.t.amt)}</span><small>${fm(s.yr?-s.t.amt:-s.t.amt*12)} / year</small></div><button data-a="cut" data-k="${esc(s.k)}" title="Mark to cut">${cu?'↩︎':'✂︎'}</button></div>`};
-return hd('Bills & subscriptions')+card(`<small>Monthly cost</small><h2>${fm(tm)}</h2><small>${fm(tm*12)} per year${cut?` · cutting ✂︎ saves ${fm(cut*12)}/yr`:''}</small>`)
-+card('<h2>Upcoming</h2>'+(A.filter(s=>!s.done).sort((a,b)=>a.days-b.days).map(row).join('')||'<small>Nothing upcoming.</small>'))
-+card('<h2>Complete</h2>'+(A.filter(s=>s.done).map(row).join('')||'<small>None paid yet this period.</small>'))
-+'<small style="text-align:center">Mark a transaction as monthly/annual to see it here.</small>'}
+function vSub(){const A=series(),hid=A.filter(s=>S.m.cut[s.k]&&s.days<0),act=A.filter(s=>!hid.includes(s)),mo=s=>s.yr?-s.t.amt/12:-s.t.amt,tm=sum(A.filter(s=>!S.m.cut[s.k]),mo),cut=sum(A.filter(s=>S.m.cut[s.k]),mo);
+const row=s=>{const c=cat(s.t.cat),cu=S.m.cut[s.k];return`<div class="row tint${cu?' ex':''}" ${tn(c)}>${bub(c)}<div class="g1"><b style="${cu?'text-decoration:line-through':''}">${esc(s.t.desc||c.n)}</b><small>Every ${s.yr?'year':'month'} · ${s.done?'paid '+s.t.date.slice(5):(s.days<0?(cu?'cut · no longer paid':'due '+s.due.slice(5)+' (late)'):'in '+s.days+' days')}</small></div><div style="text-align:right"><span>${fm(-s.t.amt)}</span><small>${fm(s.yr?-s.t.amt:-s.t.amt*12)} / year</small></div><button data-a="cut" data-k="${esc(s.k)}" title="Mark to cut">${cu?'↩︎':'✂︎'}</button></div>`};
+return hd('Bills & subscriptions')+card(`<small>Monthly cost</small><h2>${fm(tm)}</h2><small>${fm(tm*12)} per year${cut?` · ✂︎ ${fm(cut*12)}/yr cut, not counted`:''}</small>`)
++card('<h2>Upcoming</h2>'+(act.filter(s=>!s.done).sort((a,b)=>a.days-b.days).map(row).join('')||'<small>Nothing upcoming.</small>'))
++card('<h2>Complete</h2>'+(act.filter(s=>s.done).map(row).join('')||'<small>None paid yet this period.</small>'))
++(hid.length?`<button class="pill" data-a="tsc" style="display:block;margin:8px auto">${S.sc?'Hide':'Show'} ${hid.length} ended cut bill${hid.length>1?'s':''}</button>`:'')+(S.sc&&hid.length?card('<h2>Cut &amp; ended</h2>'+hid.map(row).join('')):'')+'<small style="text-align:center">Mark a transaction as monthly/annual to see it here.</small>'}
 
 function carry(id,m){const b=S.m.bud[id];if(!b||!b.r)return 0;let c=0,y=S.m.start||S.tx.reduce((a,t)=>t.date<a?t.date:a,'9999-99').slice(0,7),n=0;while(y<m&&n++<120){c+=b.a-sp(id,y);y=nx(y)}return c}
 function vBud(){const m=ym();let P=0,A=0;const rows=S.m.cats.filter(c=>c.g!='i').map(c=>{const b=S.m.bud[c.id]||{a:0},p=b.a+carry(c.id,m),a=sp(c.id,m);P+=p;A+=a;const o=S.open[c.id];
@@ -361,6 +361,17 @@ Object.assign(H,{ns:()=>{txSync();const v=(prompt('New subcategory name')||'').t
 Object.assign(H,{rtc:()=>{S.m.tabc={...DT};saveM();render()}});
 document.addEventListener('change',e=>{const k=e.target.dataset&&e.target.dataset.tc;if(k){S.m.tabc={...DT,...(S.m.tabc||{}),[k]:e.target.value};saveM();render()}});
 function syncFrom(id,t){let ch=false;S.m.goals.forEach(g=>{const n=g.c.length;g.c=g.c.filter(c=>c.tx!=id);if(g.c.length!=n)ch=true});const g=t.from&&S.m.goals.find(x=>x.id==t.from);if(g){g.c.push({d:t.date,a:-Math.abs(t.amt),tx:id});ch=true}if(ch)saveM()}
+const FI='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>';
+function fSheet(){const cs=S.m.cats,gs=Object.keys(GN).filter(g=>cs.some(c=>c.g==g)),k=S.f&&!S.f.startsWith('t:')?cat(S.f):null;
+sheet(`<h2>Filter &amp; search</h2><input id="sq" type="search" placeholder="Search description, category, tag or amount…" value="${esc(S.q)}">
+<select id="ff"><option value="">All categories</option>${gs.map(g=>`<optgroup label="${GN[g]}">${cs.filter(c=>c.g==g).map(c=>`<option value="${c.id}" ${S.f==c.id?'selected':''}>${c.i} ${esc(c.n)}</option>`).join('')}</optgroup>`).join('')}<optgroup label="Tags">${S.m.tags.map(g=>`<option value="t:${esc(g)}" ${S.f=='t:'+g?'selected':''}>🏷 ${esc(g)}</option>`).join('')}</optgroup></select>
+${k&&k.s.length?`<div class="chips">${k.s.map(s=>`<button data-a="fsub" data-v="${esc(s)}" class="tab ${S.fs==s?'on':''}">${esc(s)}</button>`).join('')}</div>`:''}
+<small>Searching looks through all dates, not just the period you’re viewing.</small>
+<div class="row2"><button class="btn d" data-a="fclr" style="color:var(--tx)">Clear all</button><button class="btn" data-a="close">Show results</button></div>`)}
+Object.assign(H,{flt:()=>fSheet(),fsub:e=>{S.fs=S.fs==e.dataset.v?'':e.dataset.v;render();fSheet()},fclr:()=>{S.f='';S.fs='';S.q='';render();fSheet()}});
+document.addEventListener('input',e=>{if(e.target.id=='sq'){S.q=e.target.value.trim();render()}});
+document.addEventListener('change',e=>{if(e.target.id=='ff'){S.f=e.target.value;S.fs='';render();fSheet()}});
+Object.assign(H,{tsc:()=>{S.sc=!S.sc;render()}});
 document.addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(el&&H[el.dataset.a])H[el.dataset.a](el)});
 document.addEventListener('keydown',e=>{if(e.key=='Enter'&&(e.target.id=='pw'||e.target.id=='em'))H.login()});
 document.addEventListener('change',e=>{const t=e.target;
