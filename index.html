@@ -175,13 +175,14 @@ const bc=(a,p)=>a>p?'var(--r)':p>0&&a>=p*.85?'var(--am)':'var(--g)';const nx=ym=
 const addm=(ds,n)=>{const d=new Date(ds+'T12:00');d.setMonth(d.getMonth()+n);return iso(d)};
 
 const SD=()=>(S.m&&+S.m.sd)||1;
+const dm=()=>SD()>1?1:0,lbl=([y,m])=>{m+=dm();if(m>11){m-=12;y++}return[y,m]},unl=(y,i)=>{let m=i-dm();if(m<0){m+=12;y--}return[y,m]};
 const pm0=d=>{let y=d.getFullYear(),m=d.getMonth();if(d.getDate()<SD()){m--;if(m<0){m=11;y--}}return[y,m]};
 const pk=ds=>{const[y,m,dd]=ds.split('-').map(Number);let yy=y,mm=m;if(dd<SD()){mm--;if(mm<1){mm=12;yy--}}return yy+'-'+pad(mm)};
 const rl=()=>{const[a,b]=R('m'),f=x=>new Date(x+'T12:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'});return f(a)+' – '+f(b)};
 // ---- ranges
 function R(m){const d=new Date(S.d);if(m=='w'){d.setDate(d.getDate()-(d.getDay()+6)%7);const e=new Date(d);e.setDate(e.getDate()+6);return[iso(d),iso(e)]}
 const[y,mo]=pm0(d);if(m=='m')return[iso(new Date(y,mo,SD())),iso(new Date(y,mo+1,SD()-1))];return[iso(new Date(y,0,SD())),iso(new Date(y+1,0,SD()-1))]}
-const lab=m=>{const[a,b]=R(m),f=x=>x.slice(8)+'.'+x.slice(5,7);return m=='m'?new Date(pm0(S.d)[0],pm0(S.d)[1],1).toLocaleDateString('en-GB',{month:'short',year:'numeric'}):m=='y'?pm0(S.d)[0]:f(a)+' – '+f(b)};
+const lab=m=>{const[a,b]=R(m),f=x=>x.slice(8)+'.'+x.slice(5,7);return m=='m'?new Date(lbl(pm0(S.d))[0],lbl(pm0(S.d))[1],1).toLocaleDateString('en-GB',{month:'short',year:'numeric'}):m=='y'?pm0(S.d)[0]:f(a)+' – '+f(b)};
 function shift(k,m){const d=S.d;if(m=='w')d.setDate(d.getDate()+7*k);else{const[y,mo]=pm0(d);S.d=m=='m'?new Date(y,mo+k,SD()):new Date(y+k,0,SD())}}
 const nav=()=>'';
 const lum=h=>{const n=parseInt(h.slice(1),16),f=v=>(v/=255)<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);return .2126*f(n>>16)+.7152*f(n>>8&255)+.0722*f(n&255)};
@@ -229,7 +230,7 @@ c+='</div>';let last='',list='',lm='',lw='';
 const wkOf=ds=>{const d=new Date(ds+'T12:00');d.setDate(d.getDate()-(d.getDay()+6)%7);return iso(d)},grp=(f,k)=>{const L=T.filter(t=>!t.ex&&f(t)==k);return{i:sum(L.filter(t=>t.amt>0),t=>t.amt),e:-sum(L.filter(t=>t.amt<0),t=>t.amt)}},
 gh=(cls,lab,g)=>{const n=g.i-g.e;return`<div class="gh ${cls}"><b>${lab}</b><span><b class="${n<0?'r':'g'}">${n<0?'-':'+'}${fm(Math.abs(n)).replace('-','')}</b><small>↑ ${sh0(g.i)} · ↓ ${sh0(g.e)}</small></span></div>`},
 mk=t=>pk(t.date),wmk=t=>pk(t.date)+'|'+wkOf(t.date),showW=!S.q&&(S.rng=='m'||S.rng=='y'),showM=!S.q&&S.rng=='y';
-T.forEach(t=>{if(showM&&mk(t)!=lm){lm=mk(t);lw='';const[yy,mm]=lm.split('-').map(Number);list+=gh('gm',new Date(yy,mm-1,1).toLocaleDateString('en-GB',{month:'long',year:'numeric'}),grp(mk,lm))}
+T.forEach(t=>{if(showM&&mk(t)!=lm){lm=mk(t);lw='';const[yy,mm]=lm.split('-').map(Number);list+=gh('gm',new Date(lbl([yy,mm-1])[0],lbl([yy,mm-1])[1],1).toLocaleDateString('en-GB',{month:'long',year:'numeric'}),grp(mk,lm))}
 if(showW&&wmk(t)!=lw){lw=wmk(t);const w0=new Date(wkOf(t.date)+'T12:00'),w1=new Date(w0);w1.setDate(w0.getDate()+6);const f=x=>x.toLocaleDateString('en-GB',{day:'numeric',month:'short'});list+=gh('gw','Week · '+f(w0)+' – '+f(w1),grp(wmk,lw))}
 if(t.date!=last){last=t.date;list+=`<small style="margin-top:8px">${new Date(t.date+'T12:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}</small>`}
 const k=cat(t.cat);list+=`<div class="row tint${t.ex?' ex':''}" ${tn(k)} data-a="edit" data-id="${t.id}">${bub(k)}<div class="g1"><b>${esc(k.n)}</b><small>${[t.desc,t.sub,...(t.tags||[]).map(x=>'#'+x),t.rec&&t.rec!='none'?'↻':'',t.ex?(t.from?'paid from savings':'excluded'):'',t.rev?'':'to review'].filter(Boolean).map(esc).join(' · ')}</small></div><span class="${t.amt>0?'g':''}">${fm(t.amt)}</span></div>`});
@@ -367,7 +368,7 @@ document.addEventListener('change',e=>{if(e.target.id=='fc'){txSync();X.cat=e.ta
 function pick(){const rt=S.tab=='tx'||S.tab=='rep'||S.tab=='bud',m=rt?S.rng:'m',y=S.py,cur=new Date().getFullYear();
 sheet(`<h2>Jump to</h2>${rt?`<div class="seg">${['w','m','y'].map(x=>`<button data-a="pmode" data-v="${x}" class="${m==x?'on':''}">${{w:'Week',m:'Month',y:'Year'}[x]}</button>`).join('')}</div>`:''}
 <div class="row2">${(rt?['w','m','y']:['m']).map(x=>`<button class="btn d" style="color:var(--tx)" data-a="pq" data-v="${x}">This ${{w:'week',m:'month',y:'year'}[x]}</button>`).join('')}</div>
-${m=='m'?`<div class="mv"><button data-a="py" data-k="-1">‹</button><b>${y}</b><button data-a="py" data-k="1">›</button></div><div class="mg">${MN.map((n,i)=>`<button data-a="pm" data-i="${i}" class="${i==pm0(S.d)[1]&&y==pm0(S.d)[0]?'on':''}">${n}</button>`).join('')}</div>`
+${m=='m'?`<div class="mv"><button data-a="py" data-k="-1">‹</button><b>${y}</b><button data-a="py" data-k="1">›</button></div><div class="mg">${MN.map((n,i)=>`<button data-a="pm" data-i="${i}" class="${i==lbl(pm0(S.d))[1]&&y==lbl(pm0(S.d))[0]?'on':''}">${n}</button>`).join('')}</div>`
 :m=='y'?`<div class="mg">${[...Array(8)].map((_,i)=>cur-6+i).map(v=>`<button data-a="pyr" data-v="${v}" class="${v==pm0(S.d)[0]?'on':''}">${v}</button>`).join('')}</div>`
 :'<small>Pick any day and you’ll see its week.</small><input type="date" id="pd" value="'+iso(S.d)+'">'}`)}
 
@@ -378,8 +379,8 @@ nt:()=>{txSync();const v=(prompt('New tag name')||'').trim();if(!v)return;if(!S.
 stx:()=>{txSync();const a=+X.amt;if(!a)return;const t={date:X.date,amt:(X.type=='i'?1:-1)*a,cat:X.cat,sub:X.sub,desc:X.desc,rec:X.rec,tags:X.tags,ex:X.ex,from:X.from,rev:true};const r=X.id?txc.doc(X.id):txc.doc();r.set(t,{merge:true});syncFrom(r.id,t);H.close()},
 nt2:()=>{const v=(prompt('New tag name')||'').trim();if(v&&!S.m.tags.includes(v)){S.m.tags.push(v);saveM();render()}},
 dtg:e=>{if(confirm('Remove this tag from the list? Past transactions keep it.')){S.m.tags=S.m.tags.filter(g=>g!=e.dataset.v);saveM();render()}},
-pick:()=>{S.py=pm0(S.d)[0];pick()},pmode:e=>{S.rng=e.dataset.v;render();pick()},pq:e=>{S.d=new Date();if(S.tab=='tx'||S.tab=='rep'||S.tab=='bud')S.rng=e.dataset.v;render();H.close()},
-py:e=>{S.py+=+e.dataset.k;pick()},pm:e=>{S.d=new Date(S.py,+e.dataset.i,SD());render();H.close()},pyr:e=>{S.d=new Date(+e.dataset.v,0,SD());S.rng='y';render();H.close()}});
+pick:()=>{S.py=S.rng=='y'&&(S.tab=='tx'||S.tab=='rep'||S.tab=='bud')?pm0(S.d)[0]:lbl(pm0(S.d))[0];pick()},pmode:e=>{S.rng=e.dataset.v;render();pick()},pq:e=>{S.d=new Date();if(S.tab=='tx'||S.tab=='rep'||S.tab=='bud')S.rng=e.dataset.v;render();H.close()},
+py:e=>{S.py+=+e.dataset.k;pick()},pm:e=>{const[u,v]=unl(S.py,+e.dataset.i);S.d=new Date(u,v,SD());render();H.close()},pyr:e=>{S.d=new Date(+e.dataset.v,0,SD());S.rng='y';render();H.close()}});
 document.addEventListener('input',e=>{if(e.target.id=='fa'||e.target.id=='fd'){txSync();const b=$('#bar');if(b)b.innerHTML=barHtml()}});
 document.addEventListener('change',e=>{if(e.target.id=='pd'&&e.target.value){S.d=new Date(e.target.value+'T12:00');render();H.close()}});
 
