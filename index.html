@@ -138,6 +138,7 @@ body{overflow-x:hidden}
 .btx{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:2px 0 2px 54px;padding:9px 12px;border-radius:14px;background:var(--s1);border:1px solid var(--line);cursor:pointer}
 .btx b{font-weight:500;font-size:14px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.btx.ex{opacity:.55}
 .pm-in{margin-left:14px;padding-left:10px;border-left:2px solid var(--line)}
+.hs.al{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);color:var(--mu);font-size:12.5px}.hs.al b{font-weight:600}
 </style></head><body>
 <main id="app"></main>
 <nav id="nv" hidden>
@@ -219,7 +220,7 @@ await b.commit();alert(n+' new transactions imported. Tap “Review” to check 
 
 // ---- views
 function vTx(){const[a,b]=R(S.rng),fl=t=>(!S.f||(S.f.startsWith('t:')?(t.tags||[]).includes(S.f.slice(2)):t.cat===S.f))&&(!S.fs||t.sub===S.fs)&&(!S.q||[t.desc,t.sub,cat(t.cat).n,...(t.tags||[]),String(Math.abs(t.amt))].join(' ').toLowerCase().includes(S.q.toLowerCase())),T=S.tx.filter(t=>(S.q||(t.date>=a&&t.date<=b))&&fl(t)).sort((x,y)=>y.date.localeCompare(x.date)),
-inc=sum(T.filter(t=>t.amt>0&&!t.ex),t=>t.amt),ex=-sum(T.filter(t=>t.amt<0&&!t.ex),t=>t.amt),nr=S.tx.filter(t=>!t.rev).length;
+inc=sum(T.filter(t=>t.amt>0&&!t.ex),t=>t.amt),ex=-sum(T.filter(t=>t.amt<0&&!t.ex),t=>t.amt),nr=S.tx.filter(t=>!t.rev).length,TP=T.filter(t=>t.date>=a&&t.date<=b),pI=sum(TP.filter(t=>t.amt>0&&!t.ex),t=>t.amt),pE=-sum(TP.filter(t=>t.amt<0&&!t.ex),t=>t.amt),fn=[S.f?(S.f.startsWith('t:')?'#'+S.f.slice(2):cat(S.f).n):'',S.fs,S.q?'“'+S.q+'”':''].filter(Boolean).join(' · ');
 const[pa,pb]=R('m'),d0=new Date(pa+'T12:00'),n=Math.round((new Date(pb+'T12:00')-d0)/864e5)+1,o=(d0.getDay()+6)%7,by={};
 S.tx.filter(t=>t.date>=pa&&t.date<=pb&&fl(t)&&!t.ex).forEach(t=>{(by[t.date]=by[t.date]||{i:0,e:0})[t.amt>0?'i':'e']+=Math.abs(t.amt)});
 let c='<div class="cal">'+[...'MTWTFSS'].map(x=>`<u>${x}</u>`).join('')+'<s></s>'.repeat(o);
@@ -232,7 +233,7 @@ T.forEach(t=>{if(showM&&mk(t)!=lm){lm=mk(t);lw='';const[yy,mm]=lm.split('-').map
 if(showW&&wmk(t)!=lw){lw=wmk(t);const w0=new Date(wkOf(t.date)+'T12:00'),w1=new Date(w0);w1.setDate(w0.getDate()+6);const f=x=>x.toLocaleDateString('en-GB',{day:'numeric',month:'short'});list+=gh('gw','Week · '+f(w0)+' – '+f(w1),grp(wmk,lw))}
 if(t.date!=last){last=t.date;list+=`<small style="margin-top:8px">${new Date(t.date+'T12:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}</small>`}
 const k=cat(t.cat);list+=`<div class="row tint${t.ex?' ex':''}" ${tn(k)} data-a="edit" data-id="${t.id}">${bub(k)}<div class="g1"><b>${esc(k.n)}</b><small>${[t.desc,t.sub,...(t.tags||[]).map(x=>'#'+x),t.rec&&t.rec!='none'?'↻':'',t.ex?(t.from?'paid from savings':'excluded'):'',t.rev?'':'to review'].filter(Boolean).map(esc).join(' · ')}</small></div><span class="${t.amt>0?'g':''}">${fm(t.amt)}</span></div>`});
-return hd('Activity')+nav(true)+`<section class="card hero"><small>${(S.q?'Search results · all dates':S.f||S.fs?'Balance (filtered)':'Balance')+(SD()>1&&S.rng=='m'&&!S.q?' · '+rl():'')}</small><div class="hb ${inc-ex<0?'r':''}">${fm(inc-ex)}</div><div class="hs"><span class="g">↑ ${fm(inc)} (Income)</span><span class="r">↓ ${fm(ex)} (Expenses)</span></div></section>`+`<div class="act"><button class="pill p" data-a="add">＋ Add</button><button class="pill" data-a="rev">Review${nr?' ('+nr+')':''}</button><button class="pill" data-a="imp">Import CSV</button></div>`
+return hd('Activity')+nav(true)+`<section class="card hero"><small>${(fn?esc(fn)+' · ':'Balance · ')+lab(S.rng)+(SD()>1&&S.rng=='m'?' ('+rl()+')':'')}</small><div class="hb ${pI-pE<0?'r':''}">${fm(pI-pE)}</div><div class="hs"><span class="g">↑ ${fm(pI)} (Income)</span><span class="r">↓ ${fm(pE)} (Expenses)</span></div>${S.q?`<div class="hs al"><span>All dates: <b class="${inc-ex<0?'r':'g'}">${fm(inc-ex)}</b></span><span>↑ ${fm(inc)}</span><span>↓ ${fm(ex)}</span></div>`:''}</section>`+`<div class="act"><button class="pill p" data-a="add">＋ Add</button><button class="pill" data-a="rev">Review${nr?' ('+nr+')':''}</button><button class="pill" data-a="imp">Import CSV</button></div>`
 +card(c)
 +plain(list||'<small>No transactions in this period.</small>')}
 
